@@ -32,7 +32,6 @@
 						<%= link_to truncate(tag), questions_path(tag: tag, public: params[:public], q_type: params[:q_type], shared: params[:shared]), title: tag %>
 					</li>
 				<% end %>
-
 			<% else %>
 				<%  @tags.sort.each do |tag| %>
 				<li class="<%= "active" if params[:tag] == tag %>">
@@ -40,9 +39,8 @@
 				</li>
 				<% end %>
 			<% end %>
-
 			<li role="presentation" class="divider"></li>
-			
+
 			<li class="nav-header">
 				<%= t ".questions_type_header" %>
 			</li>
@@ -53,10 +51,17 @@
 				<%= link_to icon_tag("align-left") + t("type.choice"), questions_path(tag: params[:tag], q_type: "choice", public: params[:public], shared: params[:shared]), id: "questionsSidebarChoiceLink" %>
 			</li>
 			<li class="<%= "active" if params[:q_type] == "text" %>">
-			<%= link_to icon_tag("th") + t("type.text"), questions_path(tag: params[:tag], q_type: "text", public: params[:public], shared: params[:shared])  %> </li>
+				<%= link_to icon_tag("th") + t("type.text"), questions_path(tag: params[:tag], q_type: "text", public: params[:public], shared: params[:shared])  %> </li>
 			<li class="<%= "active" if params[:q_type] == "number" %>">
-			<%= link_to icon_tag("equalizer") + t("type.number"), questions_path(tag: params[:tag], q_type: "number", public: params[:public], shared: params[:shared])  %> </li>
-			
+				<%= link_to icon_tag("equalizer") + t("type.number"), questions_path(tag: params[:tag], q_type: "number", public: params[:public], shared: params[:shared])  %> </li>
+			<li class="<%= "active" if params[:q_type] == "match" %>">
+			   <%= link_to icon_tag("random") + t("type.match"), questions_path(tag: params[:tag], q_type: "match", public: params[:public], shared: params[:shared])  %> </li>
+		  <li class="<%= "active" if params[:q_type] == "order" %>">
+			   <%= link_to icon_tag("list") + t("type.order"), questions_path(tag: params[:tag], q_type: "order", public: params[:public], shared: params[:shared]) %></li>
+		  <li class="<%= "active" if params[:q_type] == "category" %>">
+			   <%= link_to icon_tag("th-large") + t("type.category"), questions_path(tag: params[:tag], q_type: "category", public: params[:public], shared: params[:shared]) %></li>
+
+
 			<li class="divider"></li>
 			<li class="<%= "active" unless params[:public] || params[:shared] %>">
 			<%= link_to icon_tag("user") + t(".own_questions"), questions_path(tag: params[:tag], q_type: params[:q_type])  %> </li>
@@ -67,7 +72,7 @@
 				<%= link_to icon_tag("share") + t(".shared_questions") + (current_user.shared_questions.any? ? " " + badge(current_user.shared_questions.size.to_s, badge_style: 'info') : '').html_safe, questions_path(tag: params[:tag], q_type: params[:q_type], shared: "true"), id: "questionsSidebarSharedLink" %>
 			</li>
 			<li class="divider"></li>
-			
+
 			<li class="<%= "active" if params[:recently_commented] %>">
 				<%= link_to icon_tag("comment") + t(".recently_commented"), questions_path(recently_commented: "true", shared: params[:shared])  %>
 			</li>
