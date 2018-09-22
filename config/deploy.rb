@@ -1,11 +1,10 @@
 set :rvm_require_role, :app
-set :rvm_ruby_string, '1.9.3'
-# Load RVM's capistrano plugin.    
+set :rvm_ruby_string, "1.9.3"
+# Load RVM's capistrano plugin.
 require "rvm/capistrano"
 
-require 'new_relic/recipes'
+require "new_relic/recipes"
 require "bundler/capistrano"
-
 
 server "", :app, :web, primary: true
 
@@ -33,24 +32,24 @@ namespace :deploy do
     run "killall ruby || true"
     run "sleep 1"
   end
-  
+
   desc "start ruby processes with foreman"
   task "start", roles: :app, except: {no_release: true} do
     run "RAILS_ENV=#{rails_env} nohup bundle exec foreman start > #{shared_path}/log/foreman.log &"
   end
-  
+
   desc "restart ruby processes with foreman"
   task "restart", roles: :app, except: {no_release: true} do
     stop
     start
   end
-  
+
   deploy.task :cold do
     deploy.update
     deploy.start
   end
-  
-   task :symlink_config, roles: :app do
+
+  task :symlink_config, roles: :app do
     run "ln -nfs #{shared_path}/config/mongoid.yml #{release_path}/config/mongoid.yml"
   end
   # after "deploy:finalize_update", "deploy:symlink_config"
@@ -70,7 +69,7 @@ namespace :mongoid do
   task :symlink do
     run "test -f #{release_path}/config/mongoid.yml || ln -s #{shared_path}/mongoid.yml #{release_path}/config/mongoid.yml"
   end
- 
+
   desc "Create MongoDB indexes"
   task :index do
     run "cd #{release_path} && RAILS_ENV=production bundle exec rake db:mongoid:create_indexes", :once => true

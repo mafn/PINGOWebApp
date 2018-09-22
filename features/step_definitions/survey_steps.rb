@@ -1,4 +1,4 @@
-Given /^a survey exists$/ do 
+Given /^a survey exists$/ do
   if @event
     @survey = FactoryGirl.create(:survey, event: @event)
   else
@@ -6,7 +6,7 @@ Given /^a survey exists$/ do
   end
 end
 
-Given /^a survey with some options exists$/ do 
+Given /^a survey with some options exists$/ do
   if @event
     @survey = FactoryGirl.create(:survey_with_options, event: @event)
   else
@@ -30,7 +30,7 @@ Given /^a numeric survey exists$/ do
   end
 end
 
-Given /^the survey is running$/ do 
+Given /^the survey is running$/ do
   if @survey
     @survey.service.start!
   else

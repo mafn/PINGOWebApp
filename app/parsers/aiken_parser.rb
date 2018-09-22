@@ -1,12 +1,10 @@
 class AikenParser
-
   def export(questions)
-
     result = ""
     # Über alle Fragen iterieren
     questions.each_with_index do |question, index|
       # aiken doesn't support matching, order nor category questions, so skip them
-      if question.has_answer_pairs? 
+      if question.has_answer_pairs?
         next
       elsif question.has_order_options?
         next
@@ -54,7 +52,7 @@ class AikenParser
       # errors << {"type" => "unknown_error", "text" => current_question.name}
       # Dann evtl. question_error = true, dies überspringt den Rest der Frage
 
-      question_error = false;
+      question_error = false
       current_question = nil
       option_hash = Hash.new
       question_type = nil
@@ -103,7 +101,7 @@ class AikenParser
             elsif /[a-z]/.match(answers[0])
               # Pearson-Freitext-Frage erkannt
               name_tmp = current_question.name
-              current_question = Question.new(type:"text").service
+              current_question = Question.new(type: "text").service
               current_question.name = name_tmp
               current_question.add_setting "answers", TextSurvey::ONE_ANSWER
             else
@@ -130,7 +128,7 @@ class AikenParser
           # Abfangen von Lückentext-Fragen aus Pearson
           if line.include? "__"
             question_type = "pearson_cloze"
-            current_question = Question.new(type:"text").service
+            current_question = Question.new(type: "text").service
             current_question.name = remove_leading_numbers line.chomp
             current_question.add_setting "answers", TextSurvey::ONE_ANSWER
             current_question.user = user
@@ -148,6 +146,7 @@ class AikenParser
   end
 
   protected
+
   def remove_leading_numbers(s)
     if /\d+\)\s/.match(s)
       # Wir haben eine Pearson-Frage mit voranstehender Zahl, diese schneiden wir ab

@@ -15,11 +15,10 @@ class AnswerPair
   validates_format_of :answer1, :without => / - /
   validates_format_of :answer2, :without => / - /
 
-
   def vote_up
     self.inc(:votes, 1)
   end
-   
+
   def vote_down
     self.inc(:votes, -1)
   end

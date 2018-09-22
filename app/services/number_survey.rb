@@ -1,12 +1,11 @@
 class NumberSurvey < GenericSurvey
-
   def vote(voter, option)
     if running?(false)
       unless matches?(voters: voter)
         add_to_set(:voters, voter.to_s)
         begin
           push("voters_hash.numbers", BigDecimal.new(option.gsub(",", ".")).to_f)
-        rescue ; end
+        rescue;         end
         track_vote(voter)
         true
       end
@@ -17,7 +16,7 @@ class NumberSurvey < GenericSurvey
 
   def raw_results
     if self.total_votes > 0 && self.voters_hash
-      self.voters_hash['numbers'].map do |word|
+      self.voters_hash["numbers"].map do |word|
         OpenStruct.new voter_id: nil, answer: word
       end
     else
@@ -43,23 +42,23 @@ class NumberSurvey < GenericSurvey
     if voters_hash and voters_hash["numbers"]
       if kind == :clustered
         clustered_votes = Statistics.cluster(voters_hash["numbers"].map do |number|
-          Statistics.sigfig_to_s(number,2)
+          Statistics.sigfig_to_s(number, 2)
         end)
         Hash[clustered_votes.map do |cluster|
-          cluster = [cluster] unless cluster.respond_to? :flatten
-          min = cluster.min.to_s
-          max = cluster.max.to_s
-          if locale == :de
-            max = max.sub(".", ",")
-            min = min.sub(".", ",")
-          end
-          [min == max ? max.to_s : "#{min}-#{max}", cluster.size]
-        end
+               cluster = [cluster] unless cluster.respond_to? :flatten
+               min = cluster.min.to_s
+               max = cluster.max.to_s
+               if locale == :de
+                 max = max.sub(".", ",")
+                 min = min.sub(".", ",")
+               end
+               [min == max ? max.to_s : "#{min}-#{max}", cluster.size]
+             end
         ]
       elsif kind == :table
-        votes = voters_hash["numbers"].group_by { |number| number }.map do |key, val| 
+        votes = voters_hash["numbers"].group_by { |number| number }.map do |key, val|
           [ActionController::Base.helpers.number_with_delimiter(key, locale: locale), val.count]
-        end 
+        end
 
         Hash[votes]
       else
@@ -73,7 +72,7 @@ class NumberSurvey < GenericSurvey
   def word_counts(locale)
     number_counts :table, locale
   end
-  
+
   def terms_numeric?
     true
   end
@@ -95,5 +94,4 @@ class NumberSurvey < GenericSurvey
       Statistics.stdev voters_hash["numbers"]
     end
   end
-
 end

@@ -1,18 +1,17 @@
 class GenericSurvey < Delegator
-  
   def initialize(survey)
     super
     @survey = survey
   end
-  
+
   def __getobj__ # required
     @survey
   end
-  
+
   def __setobj__(obj)
-      @survey = obj # change delegation object
+    @survey = obj # change delegation object
   end
-  
+
   def results_comparable?
     false
   end
@@ -36,7 +35,7 @@ class GenericSurvey < Delegator
   def has_categories?
     false
   end
-  
+
   def terms_numeric? # are individual answers numeric?
     false
   end
@@ -45,6 +44,6 @@ class GenericSurvey < Delegator
     survey.settings ||= {}
     survey.settings[key.to_s] = value.to_s
   end
-  
+
   alias_method :survey, :__getobj__ # reader for survey
 end

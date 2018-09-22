@@ -7,18 +7,19 @@ class SurveysController < ApplicationController
   # GET /events/:event_id/surveys.json
   def index
     @event = Event.find_by_id_or_token(params[:event_id])
-    render text: t("messages.no_access_to_session"), status: :forbidden and return  if !@event.nil? && !current_user.admin && @event.user != current_user && !@event.collaborators.include?(current_user)
-    
+    render text: t("messages.no_access_to_session"), status: :forbidden and return if !@event.nil? && !current_user.admin && @event.user != current_user && !@event.collaborators.include?(current_user)
+
     return if performed?
-    
+
     @surveys = @event.surveys.display_fields.desc(:created_at)
 
     respond_to do |format|
       format.html { render partial: "events/surveys_table", locals: {event: @event} }
-      format.json { send_data @surveys.to_json, 
-                              :type => 'json; charset=utf-8; header=present', 
-                              :filename => 'PINGO_surveys_'+@event.token+'_'+Time.current.to_s.tr(" ", "_")+'.json' 
-                  }
+      format.json {
+        send_data @surveys.to_json,
+                  :type => "json; charset=utf-8; header=present",
+                  :filename => "PINGO_surveys_" + @event.token + "_" + Time.current.to_s.tr(" ", "_") + ".json"
+      }
     end
   end
 
@@ -33,7 +34,7 @@ class SurveysController < ApplicationController
       set_locale_for_event_or_survey
       format.html {
         if params[:remote_view] == "true"
-         render "surveys/show_remote", layout: false
+          render "surveys/show_remote", layout: false
         elsif params[:ppt_view] == "true"
           render "surveys/show_ppt", layout: false
         else
@@ -76,7 +77,7 @@ class SurveysController < ApplicationController
     @survey = Survey.new(survey_params)
     @survey.event = @event
 
-    render :text => t("messages.no_access_to_session"), :status => :forbidden and return  if !@event.nil? && !current_user.admin && @event.user != current_user
+    render :text => t("messages.no_access_to_session"), :status => :forbidden and return if !@event.nil? && !current_user.admin && @event.user != current_user
 
     respond_to do |format|
       if @survey.save
@@ -116,7 +117,7 @@ class SurveysController < ApplicationController
     check_access
     return if performed?
 
-    publish_push_notification("s"+@survey.id.to_s, {:type => "status_change", :payload => "stopped", "timestamp" => Time.new})
+    publish_push_notification("s" + @survey.id.to_s, {:type => "status_change", :payload => "stopped", "timestamp" => Time.new})
 
     @survey.destroy
 
@@ -126,26 +127,25 @@ class SurveysController < ApplicationController
     end
   end
 
-
   # GET /:id
   def participate
-    @event = Rails.cache.read("Events/"+params[:id])
+    @event = Rails.cache.read("Events/" + params[:id])
     unless @event
       begin
         pprint "getting event from DB (no cache)"
         @event = Event.find_by_id_or_token(params[:id])
-        Rails.cache.write("Events/"+params[:id], @event, :expires_in => 5.seconds)
-      rescue ; end    #rescue errors like BSON::InvalidObjectId (if people enter neither a token nor a proper Mongo ID)
+        Rails.cache.write("Events/" + params[:id], @event, :expires_in => 5.seconds)
+      rescue;       end    #rescue errors like BSON::InvalidObjectId (if people enter neither a token nor a proper Mongo ID)
     end
 
     respond_to do |format|
       format.html { #normal view
         redirect_to root_path, alert: t("messages.survey_not_found") and return if @event.nil?
-        @survey = Rails.cache.read("last_survey/"+params[:id])
+        @survey = Rails.cache.read("last_survey/" + params[:id])
         unless @survey
           pprint "getting survey from DB (no cache)"
           @survey = @event.latest_survey("participate").try(:service)
-          Rails.cache.write("last_survey/"+params[:id], @survey, :expires_in => 1.seconds)
+          Rails.cache.write("last_survey/" + params[:id], @survey, :expires_in => 1.seconds)
         end
       }
       format.json { render json: @event.state } # state info to update view if neccessary
@@ -159,21 +159,21 @@ class SurveysController < ApplicationController
     check_access
     return if performed?
 
-    if(is_numeric?(params[:stoptime]))
+    if (is_numeric?(params[:stoptime]))
       @survey.start!(params[:stoptime].to_i)
       if params[:stoptime].to_i > 0
-        publish_push_notification("s"+@survey.id.to_s, {:type => "status_change", :payload => "started_with_end", "timestamp" => Time.new})
+        publish_push_notification("s" + @survey.id.to_s, {:type => "status_change", :payload => "started_with_end", "timestamp" => Time.new})
         start_countdown_worker(@survey.id)
       else
-        publish_push_notification("s"+@survey.id.to_s, {:type => "status_change", :payload => "started", "timestamp" => Time.new})
+        publish_push_notification("s" + @survey.id.to_s, {:type => "status_change", :payload => "started", "timestamp" => Time.new})
       end
     else
       @survey.start!
-      publish_push_notification("s"+@survey.id.to_s, {:type => "status_change", :payload => "started", "timestamp" => Time.new})
+      publish_push_notification("s" + @survey.id.to_s, {:type => "status_change", :payload => "started", "timestamp" => Time.new})
     end
     respond_to do |format|
       set_locale_for_event_or_survey
-      format.html { redirect_to event_survey_path(@survey.event, @survey), notice: t('messages.survey_started') }
+      format.html { redirect_to event_survey_path(@survey.event, @survey), notice: t("messages.survey_started") }
       format.js { render "events/add_question" }
     end
   end
@@ -185,15 +185,15 @@ class SurveysController < ApplicationController
     check_access
     return if performed?
 
-    if(is_numeric?(params[:stoptime]) && params[:stoptime].to_i > 0)
+    if (is_numeric?(params[:stoptime]) && params[:stoptime].to_i > 0)
       @survey.stop!(params[:stoptime].to_i)
-      publish_push_notification("s"+@survey.id.to_s, {:type => "status_change", :payload => "stop_scheduled", "time" => @survey.time_left(true), "timestamp" => Time.new})
+      publish_push_notification("s" + @survey.id.to_s, {:type => "status_change", :payload => "stop_scheduled", "time" => @survey.time_left(true), "timestamp" => Time.new})
       start_countdown_worker(@survey.id)
-      flash_notice = t('messages.survey_stop_scheduled')
+      flash_notice = t("messages.survey_stop_scheduled")
     else
       @survey.stop!
-      publish_push_notification("s"+@survey.id.to_s, {:type => "status_change", :payload => "stopped", "timestamp" => Time.new})
-      flash_notice = t('messages.survey_stopped')
+      publish_push_notification("s" + @survey.id.to_s, {:type => "status_change", :payload => "stopped", "timestamp" => Time.new})
+      flash_notice = t("messages.survey_stopped")
     end
     respond_to do |format|
       set_locale_for_event_or_survey
@@ -207,7 +207,7 @@ class SurveysController < ApplicationController
     @event = Event.find_by_id_or_token(params[:event_id])
     original_survey = Survey.find(params[:id])
 
-    render :text => t("messages.no_access_to_session") and return  if !@event.nil? && !current_user.admin && @event.user != current_user
+    render :text => t("messages.no_access_to_session") and return if !@event.nil? && !current_user.admin && @event.user != current_user
 
     @survey = Survey.new
     @survey.event = @event
@@ -237,7 +237,7 @@ class SurveysController < ApplicationController
       set_locale_for_event_or_survey
       if @survey.save
         @survey.service.start!(duration)
-        publish_push_notification("sess"+@survey.event.token.to_s, {:type => "status_change", :payload => "started", "timestamp" => Time.new})
+        publish_push_notification("sess" + @survey.event.token.to_s, {:type => "status_change", :payload => "started", "timestamp" => Time.new})
         start_countdown_worker(@survey.id) if duration > 0
         format.html { redirect_to event_path(@survey.event), notice: t("messages.survey_successfully_created") }
         format.js { render "events/add_question" }
@@ -256,7 +256,7 @@ class SurveysController < ApplicationController
     @vid = get_or_create_voter_id
     @survey = Survey.find(params[:id]).service
     @user_just_voted = false
-    redirect_to "/"+@survey.event.to_param, alert: t("messages.no_option_error") and return if (params[:option].blank? && !@survey.multi)
+    redirect_to "/" + @survey.event.to_param, alert: t("messages.no_option_error") and return if (params[:option].blank? && !@survey.multi)
 
     if @survey.vote(@vid, params[:option])
       respond_to do |format|
@@ -264,7 +264,7 @@ class SurveysController < ApplicationController
           if @survey.has_options?
             if @survey.type == "multi"
               unless params[:option].nil?
-                voted_for = "<br>"+params[:option].map { |o| ("- "+@survey.options.only(:name).find(o).name)+"<br>"}.join
+                voted_for = "<br>" + params[:option].map { |o| ("- " + @survey.options.only(:name).find(o).name) + "<br>" }.join
               else
                 voted_for = t("matrix_keys.no_answer")
               end
@@ -274,7 +274,7 @@ class SurveysController < ApplicationController
           elsif @survey.has_answer_pairs?
             if @survey.type == "match"
               unless params[:option].nil?
-                voted_for = "<br><ul>"+params[:option].map { |o| "<li style='word-wrap: break-word;'>"+o+"</li>"}.join + "</ul>"
+                voted_for = "<br><ul>" + params[:option].map { |o| "<li style='word-wrap: break-word;'>" + o + "</li>" }.join + "</ul>"
               else
                 voted_for = t("matrix_keys.no_answer")
               end
@@ -282,7 +282,7 @@ class SurveysController < ApplicationController
           elsif @survey.has_order_options?
             if @survey.type == "order"
               unless params[:option].nil?
-                voted_for = '<br><ul style="list-style-type: none;">'+params[:option].map { |o| '<li style="word-wrap: break-word;">'+o.split(" - ")[1]+') '+ o.split(" - ")[0] +'</li>'}.join + '</ul>'
+                voted_for = '<br><ul style="list-style-type: none;">' + params[:option].map { |o| '<li style="word-wrap: break-word;">' + o.split(" - ")[1] + ") " + o.split(" - ")[0] + "</li>" }.join + "</ul>"
               else
                 voted_for = t("matrix_keys.no_answer")
               end
@@ -291,33 +291,33 @@ class SurveysController < ApplicationController
             if @survey.type == "category"
               unless params[:option].nil?
                 voted_for = '<br><ul style="list-style-type: none;">'
-                params[:option].map do |o| 
-                  voted_for += '<li style="word-wrap: break-word;">'+o.split(" - ")[0]+':<br /><ul>'
-                  o.split(" - ")[1].split(";").each do |word| 
-                    voted_for += '<li style="word-wrap: break-word;">' + word + '</li>'
+                params[:option].map do |o|
+                  voted_for += '<li style="word-wrap: break-word;">' + o.split(" - ")[0] + ":<br /><ul>"
+                  o.split(" - ")[1].split(";").each do |word|
+                    voted_for += '<li style="word-wrap: break-word;">' + word + "</li>"
                   end
-                  voted_for += '</ul></li>'
-                end 
-                voted_for += '</ul>'
+                  voted_for += "</ul></li>"
+                end
+                voted_for += "</ul>"
               else
                 voted_for = t("matrix_keys.no_answer")
               end
             end
           else
             if params[:option].respond_to? :each
-              voted_for = "<br>- " + params[:option].reject {|o| o.blank? }.join("<br>- ") + "<br>"
+              voted_for = "<br>- " + params[:option].reject { |o| o.blank? }.join("<br>- ") + "<br>"
             else
               voted_for = params[:option]
             end
           end
           @user_just_voted = true
-          redirect_to "/"+@survey.event.to_param, notice: (t("messages.voting_ok") + " " + t("messages.voted_for", option: voted_for)).html_safe
+          redirect_to "/" + @survey.event.to_param, notice: (t("messages.voting_ok") + " " + t("messages.voted_for", option: voted_for)).html_safe
         }
         format.json { head :ok }
       end
     else
       respond_to do |format|
-        format.html { redirect_to "/"+@survey.event.to_param, alert: t("messages.already_voted") }
+        format.html { redirect_to "/" + @survey.event.to_param, alert: t("messages.already_voted") }
         format.json { render text: t("messages.already_voted") }
       end
     end
@@ -336,14 +336,14 @@ class SurveysController < ApplicationController
       vid = voter
       vid = get_or_create_voter_id if vid.nil?
       @survey = Survey.find(id)
-      if @survey.vote_for_option(vid,option)
+      if @survey.vote_for_option(vid, option)
         respond_to do |format|
           format.html { redirect_to root_path, notice: t(voting_ok) }
           format.json { head :ok }
         end
       else
         respond_to do |format|
-          format.html { redirect_to "/"+@survey.event.to_param, alert: t("messages.already_voted") }
+          format.html { redirect_to "/" + @survey.event.to_param, alert: t("messages.already_voted") }
           format.json { render text: t("messages.already_voted") }
         end
       end
@@ -354,14 +354,12 @@ class SurveysController < ApplicationController
   def quick_start
     @event = Event.find_by_id_or_token(params[:id])
 
-    render :text => t("messages.no_access_to_session") and return  if !@event.nil? && !current_user.admin && @event.user != current_user
+    render :text => t("messages.no_access_to_session") and return if !@event.nil? && !current_user.admin && @event.user != current_user
 
     @survey = Survey.new
     @survey.event = @event
     # @survey.name = t("quick_survey")
     @survey.quick = true
-
-
 
     if Question.question_types.include?(params[:q_type])
       @survey.type = params[:q_type]
@@ -378,16 +376,14 @@ class SurveysController < ApplicationController
         @survey.options.new(name: option)
       end
     elsif @survey.has_options?
-
       options = (is_numeric?(params[:options]) ? params[:options].to_i : 4)
       options = 26 if options > 26
 
       alphabet = %W(A B C D E F G H I J K L M N O P Q R S T U V W X Y Z)
 
       (1..options).each do |option|
-        @survey.options.new(name: alphabet[option-1])
+        @survey.options.new(name: alphabet[option - 1])
       end
-
     elsif params[:options] && @survey.has_settings?
       @survey.add_setting :answers, params[:options]
     end
@@ -405,7 +401,7 @@ class SurveysController < ApplicationController
     respond_to do |format|
       if @survey.save
         @survey.service.start!(duration)
-        publish_push_notification("sess"+@survey.event.token.to_s, {:type => "status_change", :payload => "started", "timestamp" => Time.new})
+        publish_push_notification("sess" + @survey.event.token.to_s, {:type => "status_change", :payload => "started", "timestamp" => Time.new})
         start_countdown_worker(@survey.id) if duration > 0
         format.html { redirect_to event_path(@survey.event), notice: t("messages.survey_successfully_created") }
         format.js { render "events/add_question" }
@@ -420,7 +416,7 @@ class SurveysController < ApplicationController
   def exit_question
     @event = Event.find_by_id_or_token(params[:id])
 
-    render :text => t("messages.no_access_to_session") and return  if !@event.nil? && !current_user.admin && @event.user != current_user
+    render :text => t("messages.no_access_to_session") and return if !@event.nil? && !current_user.admin && @event.user != current_user
 
     @survey = Survey.new
     @survey.event = @event
@@ -429,18 +425,18 @@ class SurveysController < ApplicationController
     @survey.type = "single"
 
     options_amount = 3
-    options = [t("positive"),t("neutral"),t("negative")]
+    options = [t("positive"), t("neutral"), t("negative")]
 
     duration = (is_numeric?(params[:duration]) ? params[:duration].to_i : 300)
 
     (1..options_amount).each do |option|
-      @survey.options.new(name: options[option-1])
+      @survey.options.new(name: options[option - 1])
     end
 
     respond_to do |format|
       if @survey.save
         @survey.start!(duration)
-        publish_push_notification("sess"+@survey.event.token.to_s, {:type => "status_change", :payload => "started", "timestamp" => Time.new})
+        publish_push_notification("sess" + @survey.event.token.to_s, {:type => "status_change", :payload => "started", "timestamp" => Time.new})
         start_countdown_worker(@survey.id) if duration > 0
         format.html { redirect_to event_path(@survey.event), notice: t("messages.survey_successfully_created") }
         format.js { render "events/add_question" }
@@ -453,9 +449,9 @@ class SurveysController < ApplicationController
   end
 
   def changed
-    @survey = Survey.only(:original_survey_id, :type, :options, :answer_pairs, 
-      :order_options, :relative_option_order_object, :voters_hash, :categories, 
-      :sub_words, :event_id).find(params[:id]).service
+    @survey = Survey.only(:original_survey_id, :type, :options, :answer_pairs,
+                          :order_options, :relative_option_order_object, :voters_hash, :categories,
+                          :sub_words, :event_id).find(params[:id]).service
     check_access
     return if performed?
 
@@ -471,16 +467,16 @@ class SurveysController < ApplicationController
           if o.is_a? Symbol
             t("matrix_keys.#{o}")
           else
-            old_survey.options.find(o).name.truncate(27, separator: ' ')
+            old_survey.options.find(o).name.truncate(27, separator: " ")
           end
-          end.join("+")])
+        end.join("+")])
         @cols.push([key.second, key.second.map do |o|
           if o.is_a? Symbol
             t("matrix_keys.#{o}")
           else
-            new_survey.options.find(o).name.truncate(27, separator: ' ')
+            new_survey.options.find(o).name.truncate(27, separator: " ")
           end
-          end.join("+")])
+        end.join("+")])
       end
       @rows.uniq!
       @cols.uniq!
@@ -492,9 +488,9 @@ class SurveysController < ApplicationController
   end
 
   def changed_aggregated
-    @survey = Survey.only(:original_survey_id, :type, :options, :answer_pairs, 
-      :order_options, :relative_option_order_object, :voters_hash, :categories,
-      :sub_words, :event_id).find(params[:id]).service
+    @survey = Survey.only(:original_survey_id, :type, :options, :answer_pairs,
+                          :order_options, :relative_option_order_object, :voters_hash, :categories,
+                          :sub_words, :event_id).find(params[:id]).service
     check_access
     return if performed?
 
@@ -521,9 +517,9 @@ class SurveysController < ApplicationController
   end
 
   def results
-    @survey = Survey.only(:type, :options, :answer_pairs, :order_options, 
-      :relative_option_order_object, :voters_hash, :categories, 
-      :sub_words, :event_id, :voters).find(params[:id]).service
+    @survey = Survey.only(:type, :options, :answer_pairs, :order_options,
+                          :relative_option_order_object, :voters_hash, :categories,
+                          :sub_words, :event_id, :voters).find(params[:id]).service
     check_access
     return if performed?
 
@@ -550,7 +546,7 @@ class SurveysController < ApplicationController
         event = Event.find_by_id_or_token(params[:id])
         @survey = event.latest_survey if event
       end
-      render :json => "ERROR! survey with id #{params[:id]} not found"  and return if @survey.nil?
+      render :json => "ERROR! survey with id #{params[:id]} not found" and return if @survey.nil?
       results = @survey.compact_results
       results["timestamp"] = Time.new
       render :json => results and return
@@ -559,20 +555,22 @@ class SurveysController < ApplicationController
     end
     render :nothing => true
   end
+
   # :nocov:
 
   protected
+
   def survey_params
-    params.require(:survey).permit(:name, :description, 
-      options_attributes: [:name, :correct, :id], 
-      answer_pairs_attributes: [:answer1, :answer2, :correct, :id],
-      order_options_attributes: [:name, :position, :id, :_destroy],
-      relative_option_order_object_attributes: [:content_hash, :id, :_destroy],
-      categories_attributes: [:name, :sub_words, :id, :_destroy],
-      sub_words_attributes: [:name, :category, :id, :_destroy])
+    params.require(:survey).permit(:name, :description,
+                                   options_attributes: [:name, :correct, :id],
+                                   answer_pairs_attributes: [:answer1, :answer2, :correct, :id],
+                                   order_options_attributes: [:name, :position, :id, :_destroy],
+                                   relative_option_order_object_attributes: [:content_hash, :id, :_destroy],
+                                   categories_attributes: [:name, :sub_words, :id, :_destroy],
+                                   sub_words_attributes: [:name, :category, :id, :_destroy])
   end
 
   def check_access
-    render :text => t("messages.no_access_to_survey"), status: :forbidden and return  if !@survey.nil? && !current_user.admin && @survey.user != current_user && !@survey.collaborators.include?(current_user)
+    render :text => t("messages.no_access_to_survey"), status: :forbidden and return if !@survey.nil? && !current_user.admin && @survey.user != current_user && !@survey.collaborators.include?(current_user)
   end
 end

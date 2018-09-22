@@ -4,8 +4,8 @@ DATABASE = YAML.load(ERB.new(File.new(filename).read).result)
 
 if ENV["PLATTFORM"] == "heroku"
   SimpleWorker.configure do |config|
-    config.token = ENV['SIMPLE_WORKER_TOKEN']
-    config.project_id = ENV['SIMPLE_WORKER_PROJECT_ID']
+    config.token = ENV["SIMPLE_WORKER_TOKEN"]
+    config.project_id = ENV["SIMPLE_WORKER_PROJECT_ID"]
     config.global_attributes[:mongodb_settings] = DATABASE[Rails.env]
   end
 elsif (Rails.env.production? || Rails.env.staging?) && ENV["PLATTFORM"] != "heroku" && ENV["RAILS_GROUPS"] != "assets"

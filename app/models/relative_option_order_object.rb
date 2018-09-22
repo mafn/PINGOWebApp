@@ -46,5 +46,4 @@ class RelativeOptionOrderObject
       return(self.content_hash[beforeName][afterName])
     end
   end
-
 end

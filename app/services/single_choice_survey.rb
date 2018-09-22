@@ -3,15 +3,14 @@ class SingleChoiceSurvey < ChoiceSurvey
     raise "type of survey (#{survey.type}) not correct" if survey.type != "single"
     super
   end
-  
-  # VIEW options 
-  
+
+  # VIEW options
+
   def prompt
     I18n.t "surveys.participate.choose"
   end
-  
+
   def participate_partial
     "radio_option"
   end
-  
 end

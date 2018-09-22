@@ -20,7 +20,6 @@ class ApiController < ApplicationController
     end
   end
 
-
   def check_auth_token # used for PINGO remote and ppt app
     unless params[:auth_token]
       render json: {valid: false}
@@ -38,7 +37,7 @@ class ApiController < ApplicationController
 
     current_settings = u.ppt_settings || {}
     #current_settings[params[:file]] = params[:json_hash].to_s
-    fn = params[:file].to_s.gsub(".","_")
+    fn = params[:file].to_s.gsub(".", "_")
     u.update_attributes(ppt_settings: u.ppt_settings.merge({fn => params[:json_hash]}))
     render json: u.reload, only: [:ppt_settings]
   end
@@ -53,7 +52,7 @@ class ApiController < ApplicationController
 
     current_settings = u.ppt_settings || {}
     #current_settings[params[:file]] = params[:json_hash].to_s
-    fn = params[:file].to_s.gsub(".","_")
+    fn = params[:file].to_s.gsub(".", "_")
     u.update_attributes(ppt_settings: u.ppt_settings.except(fn))
     render json: u.reload, only: [:ppt_settings]
   end
@@ -87,15 +86,13 @@ class ApiController < ApplicationController
                                     name_en: I18n.t("type.number", locale: :en),
                                     options: EMPTY_OPTIONS,
                                     options_de: EMPTY_OPTIONS,
-                                    options_en: EMPTY_OPTIONS}
-    ]}
+                                    options_en: EMPTY_OPTIONS}]}
   end
 
   def duration_choices
     # drop(1) because without countdown is not supported by PINGO remote
     render json: {duration_choices: DURATION_CHOICES.drop(1)}
   end
-
 
   ### for collaborators:
 

@@ -5,7 +5,7 @@ Eclickr::Application.configure do
   config.cache_classes = true
 
   # Full error reports are disabled and caching is turned on
-  config.consider_all_requests_local       = false
+  config.consider_all_requests_local = false
   config.action_controller.perform_caching = true
 
   # Disable Rails's static asset server (Apache or nginx will already do this)
@@ -25,7 +25,7 @@ Eclickr::Application.configure do
 
   # Specifies the header that your server uses for sending files
   # config.action_dispatch.x_sendfile_header = "X-Sendfile" # for apache
-  config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect' # for nginx
+  config.action_dispatch.x_sendfile_header = "X-Accel-Redirect" # for nginx
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
   # config.force_ssl = true
@@ -37,7 +37,7 @@ Eclickr::Application.configure do
   # config.logger = SyslogLogger.new
 
   # Use a different cache store in production
-  config.cache_store = :dalli_store, "memcache-host", { :async => true }
+  config.cache_store = :dalli_store, "memcache-host", {:async => true}
 
   # Enable serving of images, stylesheets, and JavaScripts from an asset server
   # config.action_controller.asset_host = "http://assets.example.com"
@@ -58,38 +58,36 @@ Eclickr::Application.configure do
 
   # Send deprecation notices to registered listeners
   config.active_support.deprecation = :notify
-  
-  config.action_mailer.default_url_options = { :host => 'example.com' } # set this for emails
-  
+
+  config.action_mailer.default_url_options = {:host => "example.com"} # set this for emails
+
   # lograge config / https://github.com/roidrage/lograge
   config.lograge.enabled = true
   config.lograge.custom_options = lambda do |event|
     {ip: event.payload[:ip]}
   end
-  
 end
 
-  # Juggernaut Server
-  ENV["USE_JUGGERNAUT"] = "true"
-  ENV["JUGGERNAUT_HOST"] = "ws.example.com"
-  ENV["JUGGERNAUT_PORT"] = "8080"
-  
-  # Git version display in logo (set automatically at heroku)
-  #repo = Grit::Repo.new(Rails.root + '.git')
-  #last_commit = repo.commits.first
-  #ENV['COMMIT_HASH'] = last_commit.id+"/"+last_commit.authored_date.to_s
-  ENV['COMMIT_HASH'] = "unknown"
-  
-  #maxcluster URLs
-  ENV["REDISTOGO_URL"] = "redis://HOST:port"
-  ENV["MONGOHQ_URL"] = "mongodb://user:pw@HOST:PORT/DBNAME"
-  ENV["MEMCACHE_PASSWORD"] = ""
-  ENV["MEMCACHE_SERVERS"] = ""
-  ENV["MEMCACHE_USERNAME"] = ""
-  
-  ENV["NEW_RELIC_APP_NAME"] = ""
-  ENV["NEW_RELIC_LICENSE_KEY"] = ""
-  
+# Juggernaut Server
+ENV["USE_JUGGERNAUT"] = "true"
+ENV["JUGGERNAUT_HOST"] = "ws.example.com"
+ENV["JUGGERNAUT_PORT"] = "8080"
+
+# Git version display in logo (set automatically at heroku)
+#repo = Grit::Repo.new(Rails.root + '.git')
+#last_commit = repo.commits.first
+#ENV['COMMIT_HASH'] = last_commit.id+"/"+last_commit.authored_date.to_s
+ENV["COMMIT_HASH"] = "unknown"
+
+#maxcluster URLs
+ENV["REDISTOGO_URL"] = "redis://HOST:port"
+ENV["MONGOHQ_URL"] = "mongodb://user:pw@HOST:PORT/DBNAME"
+ENV["MEMCACHE_PASSWORD"] = ""
+ENV["MEMCACHE_SERVERS"] = ""
+ENV["MEMCACHE_USERNAME"] = ""
+
+ENV["NEW_RELIC_APP_NAME"] = ""
+ENV["NEW_RELIC_LICENSE_KEY"] = ""
 
 # Domain without slash
 ENV["URL_PREFIX"] = "http://example.com" # make sure you also set the URL for action mailer at the end of the config block above

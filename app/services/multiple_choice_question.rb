@@ -4,14 +4,14 @@ class MultipleChoiceQuestion < ChoiceQuestion
     super
     self.question.type = "multi" unless self.question.persisted?
   end
-  
+
   def form_partial
     "multi_form"
   end
 
   def transform
     self.question.type = "single"
-    unless self.question.question_options.select{|o| o.correct }.size <= 1 
+    unless self.question.question_options.select { |o| o.correct }.size <= 1
       self.question.question_options = self.question.question_options.map do |o|
         o.correct = false
         o

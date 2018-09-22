@@ -1,5 +1,4 @@
 Eclickr::Application.routes.draw do
-
   root :to => "home#index"
 
   post "find" => "events#find"
@@ -15,23 +14,21 @@ Eclickr::Application.routes.draw do
   post "api/delete_ppt_settings" => "api#delete_ppt_settings"
   get "api/question_types" => "api#question_types"
   get "api/duration_choices" => "api#duration_choices"
-  
+
   get "api/find_user_by_email" => "api#find_user_by_email"
 
   get "stats" => "home#stats", as: :stats
   get "switch_view" => "home#switch_view"
 
-
   get "api/:cmd" => "surveys#api"
 
   post "vote-test" => "surveys#vote_test"
 
-  devise_for :users, :controllers => {:registrations => 'settings'}
+  devise_for :users, :controllers => {:registrations => "settings"}
 
   devise_scope :user do
     post "users/reset_api_token" => "settings#reset_auth_token", as: :reset_auth_token
   end
-
 
   resources :events do
     member do
@@ -44,27 +41,27 @@ Eclickr::Application.routes.draw do
     end
     resources :surveys do
       member do
-        post 'start'
-        post 'stop'
-        post 'repeat'
-        get 'changed'
-        get 'changed_aggregated'
-        get 'results'
+        post "start"
+        post "stop"
+        post "repeat"
+        get "changed"
+        get "changed_aggregated"
+        get "results"
       end
     end
   end
 
   resources :questions do
     member do
-      post 'add_to_own'
-      get 'clone'
+      post "add_to_own"
+      get "clone"
     end
     resources :question_comments, only: [:create, :destroy, :index]
     collection do
       post "export"
-      get 'import'
-      post 'upload'
-      post 'share'
+      get "import"
+      post "upload"
+      post "share"
     end
   end
   post "questions/:id/transform" => "questions#transform", as: "transform_question"
@@ -76,7 +73,7 @@ Eclickr::Application.routes.draw do
 
   namespace :admin do
     resources :users
-    get 'voting_analytics' => 'users#voting_analytics'
+    get "voting_analytics" => "users#voting_analytics"
   end
 
   # for survey quicklinks like "/1234" - must be last route.

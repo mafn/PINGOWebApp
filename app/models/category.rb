@@ -12,5 +12,4 @@ class Category
   # "word1;word2;word3"
 
   validates_format_of :name, :without => / - /
-
 end

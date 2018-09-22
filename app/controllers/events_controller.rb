@@ -5,9 +5,9 @@ class EventsController < ApplicationController
   # GET /events
   # GET /events.json
   def index
-    if(params[:all] && current_user.admin?)
+    if (params[:all] && current_user.admin?)
       @events = Event.all.desc(:created_at)
-      @events = @events.limit(200) unless params[:all] == 'all'
+      @events = @events.limit(200) unless params[:all] == "all"
     elsif params[:shared]
       @events = current_user.shared_events.desc(:created_at)
       redirect_to events_url, alert: "No shared sessions found." and return unless @events.any? # should not occur
@@ -28,7 +28,7 @@ class EventsController < ApplicationController
   # POST /find
   def find
     if params[:id] && params[:id].match(/\A\d{3,}\z/) # at least 3 digits
-      redirect_to "/"+params[:id]
+      redirect_to "/" + params[:id]
     else
       redirect_to root_path, alert: t("messages.survey_not_found")
     end
@@ -67,7 +67,6 @@ class EventsController < ApplicationController
 
     check_access
     return if performed?
-
   end
 
   # POST /events
@@ -150,16 +149,14 @@ class EventsController < ApplicationController
     @survey = @survey.service
 
     if @survey.has_options?
-
       options = (is_numeric?(params[:options]) ? params[:options].to_i : 4)
       options = 26 if options > 26
 
       alphabet = %W(A B C D E F G H I J K L M N O P Q R S T U V W X Y Z)
 
       (1..options).each do |option|
-        @survey.options.new(name: alphabet[option-1])
+        @survey.options.new(name: alphabet[option - 1])
       end
-
     elsif params[:options] && @survey.has_settings?
       @survey.add_setting :answers, params[:options]
     end
@@ -211,7 +208,7 @@ class EventsController < ApplicationController
     respond_to do |format|
       if @survey.save
         @survey.start!(duration)
-        publish_push_notification("sess"+@survey.event.token.to_s, {:type => "status_change", :payload => "started", "timestamp" => Time.new})
+        publish_push_notification("sess" + @survey.event.token.to_s, {:type => "status_change", :payload => "started", "timestamp" => Time.new})
         start_countdown_worker(@survey.id) if duration > 0
         format.html { redirect_to event_path(@survey.event), notice: t("messages.survey_successfully_created") }
         format.js
@@ -230,9 +227,9 @@ class EventsController < ApplicationController
     check_access
     return if performed?
 
-    csv_data = CSV.generate col_sep: "\t", quote_char: '"', force_quotes: true  do |csv|
+    csv_data = CSV.generate col_sep: "\t", quote_char: '"', force_quotes: true do |csv|
       # header row
-      csv << ['Survey ID', 'Question', 'Question Type', 'Question Options', 'Voter ID', 'Survey Start', 'Survey End', 'Answer']
+      csv << ["Survey ID", "Question", "Question Type", "Question Options", "Voter ID", "Survey Start", "Survey End", "Answer"]
 
       # survey objects
       @event.surveys.map(&:service).each do |survey|
@@ -253,21 +250,22 @@ class EventsController < ApplicationController
             result.voter_id,
             survey.starts,
             survey.ends,
-            result.answer
+            result.answer,
           ]
         end
       end
     end
 
-    send_data csv_data, :type => 'text/csv; charset=utf-8; header=present', :filename => 'PINGO_surveys_'+@event.token+'_'+Time.current.to_s.tr(" ", "_")+'.csv'
+    send_data csv_data, :type => "text/csv; charset=utf-8; header=present", :filename => "PINGO_surveys_" + @event.token + "_" + Time.current.to_s.tr(" ", "_") + ".csv"
   end
 
   protected
+
   def event_params
     params.require(:event).permit(:name, :description, :mathjax, :collaborators_form, :custom_locale)
   end
 
   def check_access
-    render text: t("messages.no_access_to_session"), status: :forbidden and return  if !@event.nil? && !current_user.admin && @event.user != current_user && !@event.collaborators.include?(current_user)
+    render text: t("messages.no_access_to_session"), status: :forbidden and return if !@event.nil? && !current_user.admin && @event.user != current_user && !@event.collaborators.include?(current_user)
   end
 end

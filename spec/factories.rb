@@ -1,12 +1,12 @@
-require 'factory_girl'
+require "factory_girl"
 
 FactoryGirl.define do
   factory :user do
-    first_name 'Testy'
-    last_name 'McUserton'
-    email 'example@example.com'
-    password 'please'
-    password_confirmation 'please'
+    first_name "Testy"
+    last_name "McUserton"
+    email "example@example.com"
+    password "please"
+    password_confirmation "please"
     organization "test orga"
     faculty "test fac"
     chair "test chair"
@@ -19,18 +19,18 @@ FactoryGirl.define do
   end
 
   factory :hacker, class: User do
-    first_name 'Hacky'
-    last_name 'McCracker'
-    email 'hack@example.com'
-    password 'please'
-    password_confirmation 'please'
+    first_name "Hacky"
+    last_name "McCracker"
+    email "hack@example.com"
+    password "please"
+    password_confirmation "please"
     organization "test orga"
     faculty "test fac"
     chair "test chair"
   end
 
   factory :event do
-    name 'Test Session'
+    name "Test Session"
     user
   end
 
@@ -41,7 +41,7 @@ FactoryGirl.define do
   end
 
   factory :survey do
-    name 'Test survey'
+    name "Test survey"
     event
     type "single"
     # survey_with_options will create answer options after the survey has been created
@@ -61,14 +61,13 @@ FactoryGirl.define do
       end
     end
 
-
     factory :text_survey do
-      name 'Tag cloud test survey'
+      name "Tag cloud test survey"
       type "text"
     end
 
     factory :numeric_survey do
-      name 'Numeric test survey'
+      name "Numeric test survey"
       type "number"
     end
   end
