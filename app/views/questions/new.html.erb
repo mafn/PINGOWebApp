@@ -4,7 +4,6 @@
     <!--<p><%= link_to t("back"), :back, class:"btn btn-default btn-sm" %></p>-->
   </div>
 </div>
-
 <div class="row row-margin">
   <div class="tabbable tabs-left">
     <div class="col-md-3">
@@ -18,10 +17,10 @@
         <li><a href="#category-tab" data-toggle="tab"><%= t "type.category" %></a></li>
       </ul>
       <div class="well well-sm">
-          <small><%= link_to t("questions.how_will_it_look")+"?", "#screenshotModal", data: {toggle: "modal"} %>
+        <small><%= link_to t("questions.how_will_it_look")+"?", "#screenshotModal", data: {toggle: "modal"} %>
           <br>
           <%= link_to t("questions.chart_notice"), "#chartNoticeModal", data: {toggle: "modal"} %>
-          </small>
+        </small>
       </div>
     </div>
     <div class="tab-content col-md-9">
@@ -32,10 +31,10 @@
         <%= render partial: @question_single.form_partial, locals: {question: @question_single, namespace: 'single'} %>
       </div>
       <div class="tab-pane" id="multi-tab">
-       	<%= render partial: @question_multi.form_partial, locals: {question: @question_multi} %>
+        <%= render partial: @question_multi.form_partial, locals: {question: @question_multi} %>
       </div>
-  	  <div class="tab-pane" id="text-tab">
-       	<%= render partial: @question_text.form_partial, locals: {question: @question_text} %>
+      <div class="tab-pane" id="text-tab">
+        <%= render partial: @question_text.form_partial, locals: {question: @question_text} %>
       </div>
       <div class="tab-pane" id="number-tab">
         <%= render partial: @question_number.form_partial, locals: {question: @question_number} %>
@@ -52,17 +51,14 @@
     </div>
   </div>
 </div>
-
 <div class="row">
   <div class="col-md-12">
     <%= link_to t("back"), :back, class:"btn btn-default btn-sm" %>
   </div>
 </div>
-
 <%= render "screenshot_modal" %>
 <%= render "chart_notice_modal" %>
-
 <% if params[:tour] == "true" %>
- <%= render "tours/enable_tour" %>
- <%= render "tours/questions/new" %>
+  <%= render "tours/enable_tour" %>
+  <%= render "tours/questions/new" %>
 <% end %>

@@ -1,18 +1,14 @@
 <div id="disableTourDiv">
-	<p><%= link_to t("tours.exit_tour"), params.merge(tour: "false"), class: "btn btn-small btn-warning" %></p>
+  <p><%= link_to t("tours.exit_tour"), params.merge(tour: "false"), class: "btn btn-small btn-warning" %></p>
 </div>
-
 <link rel=" stylesheet" type="text/css" href="/stylesheets/jquery.joyride-2.0.3.css">
-
 <% content_for :javascript do %>
-	<script src="/scripts/jquery.joyride-2.0.3.js"></script>
-
-	<script>
-	  $(document).ready(function() {
-	  	var foo = $("#tourStops").joyride({
-	  		'autoStart': true
-	    });
-	  });
-	</script>
-	
+  <script src="/scripts/jquery.joyride-2.0.3.js"></script>
+  <script>
+    $(document).ready(function() {
+    	var foo = $("#tourStops").joyride({
+    		'autoStart': true
+      });
+    });
+  </script>
 <% end %>

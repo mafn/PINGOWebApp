@@ -2,9 +2,9 @@
   <table id="result-table" height="300" class="result-table table table-bordered">
     <thead>
       <tr>
-          <% answer2s = survey.get_all_answer2 %>
-          <% columnWidthPercentage = number_to_percentage(1.to_f / (1 + answer2s.length).to_f * 100.to_f, :precision => 0) %>
-          <th style="width: <%= columnWidthPercentage %>;">&nbsp;</th>
+        <% answer2s = survey.get_all_answer2 %>
+        <% columnWidthPercentage = number_to_percentage(1.to_f / (1 + answer2s.length).to_f * 100.to_f, :precision => 0) %>
+        <th style="width: <%= columnWidthPercentage %>;">&nbsp;</th>
           <% answer2s.shuffle! %>
           <% answer2s.each do |answer2| %>
             <th scope="col" style="width: <%= columnWidthPercentage %>;"><%= answer2 %></th>
@@ -25,20 +25,20 @@
             <td class="result-table-td toCorrectSwitchable" style="height: <%= rowHeightPercentage %>;">
               <div>
                 <div style="height:<%= percentage %>;" />
-                <p><%= percentage %></p>
-              </div>
-            </td>
-          <% else %>
-            <td class="result-table-td" style="height: <%= rowHeightPercentage %>;">
+        <p><%= percentage %></p>
+      </div>
+    </td>
+  <% else %>
+    <td class="result-table-td" style="height: <%= rowHeightPercentage %>;">
               <div>  
                 <div style="height:<%= percentage %>;" />
-                <p><%= percentage %></p>
-              </div>
-            </td>
-          <% end %>
-        <% end %>
-      </tr>
-      <% end %>
-    </tbody>
-  </table>
+    <p><%= percentage %></p>
+  </div>
+</td>
+<% end %>
+<% end %>
+</tr>
+<% end %>
+</tbody>
+</table>
 </body>

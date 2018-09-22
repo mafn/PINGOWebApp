@@ -4,20 +4,20 @@
     <div>
       <%= form.input :name, input_html: {class: "input-xxlarge", placeholder: ""} %>
     </div>
-      <%= form.hidden_field :type, value: "category" %>
-      <%= hidden_field_tag :redirect_to_session, params[:redirect_to_session] %>
+    <%= form.hidden_field :type, value: "category" %>
+    <%= hidden_field_tag :redirect_to_session, params[:redirect_to_session] %>
     <div>
       <%= form.input :tags, input_html: { class:  "input-xxlarge" , placeholder: "Tags" }, required: false %>
       <% if current_user.question_tags && !current_user.question_tags.blank? %>
-      <%= select_tag "tags", options_for_select([[t("questions.add_from_your_tags"), '']] + current_user.question_tags.sort.map{ |t| [t, t]}), id: "category_select_tag" %>
-      <br>&nbsp;
+        <%= select_tag "tags", options_for_select([[t("questions.add_from_your_tags"), '']] + current_user.question_tags.sort.map{ |t| [t, t]}), id: "category_select_tag" %>
+        <br>
+        &nbsp;
       <% end %>
     </div>
     <div>
       <label for="public" class="checkbox inline"><%= form.check_box :public, :class => "checkbox inline" %><%= t("public") %></label>
     </div>
   </div>
-
   <h3><%= t("surveys.edit.categories_and_sub_words_for_category_survey") %></h3>
   <div id="options" class="row-fluid">
     <div class="span10">
@@ -36,12 +36,12 @@
   <%= form.hidden_field :collaborators_form, class:"collaborators-form" %>
   <%= form.submit class: "btn btn-primary", id: "single_question_submit" %>
   <span style="margin-left:20px;">
-    <% if params[:redirect_to_session] %>  
+    <% if params[:redirect_to_session] %>
       <label for="also_start_question" class="checkbox"><%= check_box_tag "also_start_question", "false", false %> <%= t "questions.start_in_session" %>
       </label><br>
-      </span> 
-    <% end %>
-  </span>
+    </span>
+  <% end %>
+</span>
 <% end %>
 <% content_for :javascript do %>
   <script>
@@ -49,13 +49,13 @@
       $("#category_question_tags").tagsManager({ // http://welldonethings.com/tags/manager
         prefilled: "<%= question.tags %>",
         hiddenTagListName: "category_question[tags]",
-		    preventSubmitOnEnter: true
+    		    preventSubmitOnEnter: true
       });
       $("#category_select_tag").change(function(){
-		    $("#category_question_tags").tagsManager("pushTag", $("#category_select_tag").val());
-		    $("#category_select_tag option:first").attr('selected',true);
+    		    $("#category_question_tags").tagsManager("pushTag", $("#category_select_tag").val());
+    		    $("#category_select_tag option:first").attr('selected',true);
       });
-
+    
       $(function() {
         // This function allows us to change the inputs just before the submit
         $('#new_category_question').submit(function() {
@@ -63,9 +63,9 @@
           return true;
         });
       });
-
-      
-      function add_categories_to_sub_words_and_vice_versa() {        
+    
+    
+      function add_categories_to_sub_words_and_vice_versa() {
         $("#new_category_question").find(".controls").each(function(){
           category_name = $(this).find(".category_name_field").attr("value");
           if((typeof category_name)=="string") {
@@ -86,9 +86,9 @@
           }
         });
       }
-
+    
     });
-
+    
     function introduce_destroy_and_remove_parent_li() {
       var target = event.target || event.srcElement;
       var hiddenNameField = target.parentNode.parentNode.getElementsByClassName("sub_word_name_field")[0];
@@ -103,6 +103,5 @@
       hiddenDiv.appendChild(hiddenCategoryField);
       target.parentNode.parentNode.parentNode.removeChild(target.parentNode.parentNode);
     }
-
   </script>
 <% end %>

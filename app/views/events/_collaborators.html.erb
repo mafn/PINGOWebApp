@@ -1,20 +1,18 @@
 <label for="mail_for_collaborators">
-	<span data-toggle="popover" data-placement="left" data-content="<%= strip_tags(t(".collaborators_tooltip")) %>" title="<%= strip_tags(t(".collaborators_headline")) %>">
-		<%= icon_tag(:share) %> <%= t ".collaborators_headline" %>
-	</span>
+  <span data-toggle="popover" data-placement="left" data-content="<%= strip_tags(t(".collaborators_tooltip")) %>" title="<%= strip_tags(t(".collaborators_headline")) %>">
+    <%= icon_tag(:share) %> <%= t ".collaborators_headline" %>
+  </span>
 </label>
-
 <ul id="collaborators-list" class="collaborators">
-<% item.collaborators.each do |user| %>
-	<li class="collaborators__item">
-		<strong><%= user.name %></strong> (<%= user.email %>)
-		<a href="#" data-id="<%= user.id %>" class="remove-collaborator collaborators__action">
-			<%= t("remove") %>
-		</a>
-	</li>
-<% end %>
+  <% item.collaborators.each do |user| %>
+    <li class="collaborators__item">
+      <strong><%= user.name %></strong> (<%= user.email %>)
+      <a href="#" data-id="<%= user.id %>" class="remove-collaborator collaborators__action">
+        <%= t("remove") %>
+      </a>
+    </li>
+  <% end %>
 </ul>
-
 <div class="input-group">
   <input
   	placeholder="<%= strip_tags(t(".collaborators_placeholder")) %>"
@@ -26,18 +24,16 @@
   	id="mail_for_collaborators"
   	data-source='<%= current_user.contacts.map {|u| "#{u.name} (#{u.email})"}.to_json %>'
   >
-  <span class="input-group-btn">
-    <a class="btn btn-default" id="collaborator-search"><%= t(".share") %></a>
-  </span>
-</div>
-
-<p class="alert alert-danger small" id="collaborators_feedback" style="display: none"></p>
-
-<%= content_for :javascript do  %>
-<script type="text/javascript" charset="utf8">
-	window.PINGO.collaborators = { locales: {
-	remove: "<%= t('remove').html_safe %>",
-	not_found: "<%= t('events.collaborators.not_found').html_safe %>"
-}}
-</script>
-<% end %>
+    <span class="input-group-btn">
+      <a class="btn btn-default" id="collaborator-search"><%= t(".share") %></a>
+    </span>
+  </div>
+  <p class="alert alert-danger small" id="collaborators_feedback" style="display: none"></p>
+  <%= content_for :javascript do  %>
+    <script type="text/javascript" charset="utf8">
+      window.PINGO.collaborators = { locales: {
+      remove: "<%= t('remove').html_safe %>",
+      not_found: "<%= t('events.collaborators.not_found').html_safe %>"
+      }}
+    </script>
+  <% end %>

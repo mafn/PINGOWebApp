@@ -17,7 +17,6 @@
     <%= radio_button_tag "q_type", 'number', quick_start_settings["q_type"] == "number", class: "type-radio", data: {"survey-type" => "number"} %> <%= t("type.number") %> <span class="label label-info">BETA</span>
   </label>
 </div>
-
 <div class="options_container form-group">
   <label for="options"><%= t "quick_start.how_many_options_short" %></label>
   <%= select_tag "options", options_for_select(answer_choices, quick_start_settings["options"]), tabindex: 4, class: "form-control answer-options-select" %>
@@ -26,10 +25,8 @@
   <label for="duration"><%= t "quick_start.how_long_short" %></label>
   <%= select_tag "duration", options_for_select(duration_choices, quick_start_settings["duration"]), tabindex: 5, class: "form-control" %>
 </div>
-
-
 <div class="remember form-group">
-    <input class="btn btn-primary" id="new-event-survey_submit" value="<%= t "start" %>" tabindex="8" type="submit" class="inline">
-    <label for="remember" class="checkbox pull-right"><input class="checkbox inline" id="remember" name="remember_settings" value="1" tabindex="7" type="checkbox">
+  <input class="btn btn-primary" id="new-event-survey_submit" value="<%= t "start" %>" tabindex="8" type="submit" class="inline">
+  <label for="remember" class="checkbox pull-right"><input class="checkbox inline" id="remember" name="remember_settings" value="1" tabindex="7" type="checkbox">
     <%= t "quick_start.remember_settings" %></label>
 </div>
