@@ -21,8 +21,17 @@
 	<% if survey.type == "text" %>
 		<p><%= t ".is_text" %></p>
 	<% end %>
+	<% if survey.type == "match" %>
+	    <p><%= t ".is_match" %></p>
+	<% end %>
+	<% if survey.type == "order" %>
+	    <p><%= t ".is_order" %></p>
+	<% end %>
+	<% if survey.type == "category" %>
+	    <p><%= t ".is_category" %></p>
+	<% end %>
 
-	<!--<% if survey.running?(true) %>
+		<!--<% if survey.running?(true) %>
 		<p id="running-notice">
 		<small><%= t(".running_notice", :url => ENV["URL_PREFIX"]+"/"+survey.event.token.to_s).html_safe %><br/>
 			<% if survey.ends %>
@@ -66,13 +75,57 @@
 				<a class="btn btn-default pull-right canvas__show-highlight" id="show-highlights" data-toggle="button"><%= t(".mark_correct") %></a>
 				<% end %>
 
-    <% if survey.original_survey %>
-				<ul class="chart-container__legend legend">
-					<li class="legend__item legend__item--first"><%= t("surveys.show.chart_first") %></li>
-					<li class="legend__item legend__item--repeated"><%= t("surveys.show.chart_repeated") %></li>
-				</ul>
+    			<% if survey.original_survey %>
+					<ul class="chart-container__legend legend">
+						<li class="legend__item legend__item--first"><%= t("surveys.show.chart_first") %></li>
+						<li class="legend__item legend__item--repeated"><%= t("surveys.show.chart_repeated") %></li>
+					</ul>
+				<% end %>
 			</div>
 		<% end %>
+		</div>
+	</section>
+
+
+<% elsif survey.has_answer_pairs? %>
+    <section class="option-results">
+		<div class="chart-container hide-button">
+			<h4 class="chart-container__heading"><%= t("results") %></h4>
+			<div class="canvas_downloadable clearfix">
+				<%= render partial: "answer_pair_result_table", locals: {survey: survey} %>
+				<a href="#chart" class="btn canvas_download-button" id="save_table_btn" download="pingo_table.html" target="_blank"><%= icon_tag("download-alt") %></a>
+				<a class="btn pull-right canvas__show-highlight" id="showCorrectsBtn" data-toggle="button"><%= t("surveys.show.mark_corrects") %></a>
+			</div>
+		</div>
+	</section>
+
+<% elsif survey.has_order_options? %>
+    <section class="option-results">
+		<div class="chart-container hide-button">
+			<h4 class="chart-container__heading"><%= t("absolute_results") %></h4>
+			<div class="canvas_downloadable clearfix">
+				<%= render partial: "order_option_absolute_results_table", locals: {survey: survey} %>
+				<a href="#chart" class="btn canvas_download-button" id="save_table_btn" download="pingo_table.html" target="_blank"><%= icon_tag("download-alt") %></a>
+			</div>
+			<a class="btn pull-right" id="showCorrectsOrderBtn" data-toggle="button"><%= t("surveys.show.correct_order_and_mark") %></a>
+			<h4 class="chart-container__heading"><%= t("relative_results") %></h4>
+			<div class="canvas_downloadable clearfix">
+				<div id="XBeforeYTableDefault"><%= render partial: "order_option_relative_results_table", locals: {survey: survey} %></div>
+				<div id="XBeforeYTableOrdered"><%= render partial: "order_option_ordered_relative_results_table", locals: {survey: survey} %></div>
+				<a href="#chart" class="btn canvas_download-button" id="save_relative_table_btn" download="pingo_relative_table.html" target="_blank"><%= icon_tag("download-alt") %></a>
+			</div>
+		</div>
+	</section>
+
+<% elsif survey.has_categories? %>
+     <section class="option-results">
+		<div class="chart-container hide-button">
+			<h4 class="chart-container__heading"><%= t("results") %></h4>
+			<div class="canvas_downloadable clearfix">
+				<%= render partial: "category_results_table", locals: {survey: survey} %>
+				<a href="#chart" class="btn canvas_download-button" id="save_table_btn" download="pingo_table.html" target="_blank"><%= icon_tag("download-alt") %></a>
+				<a class="btn pull-right canvas__show-highlight" id="showCorrectsBtn" data-toggle="button"><%= t("surveys.show.mark_corrects") %></a>
+			</div>
 		</div>
 	</section>
 
@@ -151,8 +204,10 @@
 			<%= select_tag "duration", options_for_select(duration_choices(false), 120), class:"form-control", id: "repeatDuration" %>
 		</form>
 
-			<script>
+		<script>
 			$(document).ready(function() {
+				if($("#XBeforeYTableOrdered").length) {$("#XBeforeYTableOrdered").hide()}
+
 		  		$(document).on("change", "#repeatDuration", function() {
 		  			$("#hidden_stoptime").val($('#repeatDuration option:selected').val());
 		  		});
@@ -163,10 +218,50 @@
 		  				return true;
 		  			}
 		  		});
+
+				$(document).on("click", "#save_table_btn", function(e) {
+					if($("#result-table").length > 0) {
+						var base_str = 'data:text/html,' + '<meta http-equiv="Content-Type" content="text/html; charset=utf-8">'
+						+ '<p><b><%= survey.name || t(".survey") %></b></p><br />'
+						+ '<div class="canvas_downloadable clearfix">' +
+						'<table id="result-table" height="300" class="table table-bordered">' +
+						$("#result-table").html() + '</table></div>';
+						$(this).attr("href", base_str);
+		  				return true;
+					}
+				});
+
+				$(document).on("click", "#save_relative_table_btn", function(e) {
+					if($("#relative-result-table").length > 0) {
+						var base_str = 'data:text/html,' + '<meta http-equiv="Content-Type" content="text/html; charset=utf-8">'
+						+ '<p><b><%= survey.name || t(".survey") %></b></p><br />'
+						+ '<div class="canvas_downloadable clearfix">' +
+						'<table id="relative-result-table" height="300" class="table table-bordered">' +
+						$("#relative-result-table").html() + '</table></div>';
+						$(this).attr("href", base_str);
+		  				return true;
+					}
+				});
+
 				if(window.PINGO.isMSIE()){
 			  		$(".canvas_downloadable").removeClass("canvas_downloadable");
 			  	}
+
+			  	$("#showCorrectsBtn").click(function() {
+			  		$(".toCorrectSwitchable").toggleClass("greenBorder");
+			  	});
+
+			  	$("#showCorrectsOrderBtn").click(function() {
+			  		$(".toCorrectSwitchable").toggleClass("greenBorder");
+			  		if($("#XBeforeYTableDefault").is(":visible")) {
+			  			$("#XBeforeYTableDefault").hide();
+			  			$("#XBeforeYTableOrdered").show();
+			  		} else {
+			  			$("#XBeforeYTableOrdered").hide();
+			  			$("#XBeforeYTableDefault").show();
+			  		}
+			  	});
 		  	});
-		 	</script>
+		</script>
 	<% end %>
 </div>

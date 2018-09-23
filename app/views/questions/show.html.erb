@@ -15,7 +15,13 @@ Multiple Choice
 <% elsif @question.type == "text" %>
 Text
 <% elsif @question.type == "number" %>
-<%= t("type.number") %>
+	<%= t("type.number") %>
+<% elsif @question.type == "match" %>
+  <%= t("type.match") %>
+<% elsif @question.type == "order" %>
+  <%= t("type.order") %>
+<% elsif @question.type == "category" %>
+  <%= t("type.category") %>
 <% end %>
 <br>
 <p><strong>Tags:</strong> <%= @question.tags_array.join(", ") %> </p>
@@ -25,6 +31,37 @@ Text
 	<%= render partial: "question_option", collection: @question.question_options %>
 </ul>
 <% end %>
+
+<% if @question.has_answer_pairs? %>
+  <strong><%= t("surveys.show.answer_pairs") %></strong>
+  <ul id="answer-pair-list">
+  <%= render partial: "answer_pair", collection: @question.answer_pairs.where(correct: true) %>
+  </ul>
+<% end %>
+
+<% if @question.has_order_options? %>
+  <strong><%= t("surveys.show.order_options") %></strong>
+  <ul id="answer-pair-list">
+  <%= render partial: "order_option", collection: @question.order_options %>
+  </ul>
+<% end %>
+
+<% if @question.has_categories? %>
+  <strong><%= t("surveys.show.categories") %></strong>
+  <ul id="answer-pair-list">
+    <% @question.categories.each do |category| %>
+      <li>
+        <%= category.name %>:
+        <ul>
+          <% category.sub_words.split(';').each do |sub_word| %>
+            <li style="word-wrap: break-word;"><%= sub_word %></li>
+          <% end %>
+        </ul>
+      </li>
+    <% end %>
+  </ul>
+<% end %>
+
 <% if @question.can_be_accessed_by?(current_user) %>
 	<%= link_to t("edit"), edit_question_path(@question), class: "btn btn-small btn-default" %>
 	<%= link_to t("delete"), @question, confirm: t("questions.index.delete_sure"), method: :delete, class: "btn btn-default btn-small" %>
