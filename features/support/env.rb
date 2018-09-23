@@ -66,13 +66,16 @@ if ENV["HEADLESS"] && ENV["HEADLESS"] == "true"
   headless.start
 end
 
-require "capybara/poltergeist"
-Capybara.javascript_driver = :poltergeist
-#Capybara.javascript_driver = :webkit # if RUBY_PLATFORM.downcase.include?("darwin")
+Capybara.javascript_driver = :webkit
 
 require "capybara-screenshot/cucumber" # https://github.com/mattheworiordan/capybara-screenshot
 
 Capybara.configure do |config| # 1.x compatibility
   config.match = :prefer_exact
   config.ignore_hidden_elements = false
+end
+Capybara::Webkit.configure do |config|
+  config.block_unknown_urls
+  config.allow_url("https://cdn.mathjax.org")
+  config.allow_url("https://ajax.aspnetcdn.com/")
 end

@@ -1,13 +1,13 @@
 Feature: Pre-define questions
-	As a lecturer 
-	I want to be able to pre-define questions with answers
-	In order to ask them during lectures
+  As a lecturer
+  I want to be able to pre-define questions with answers
+  In order to ask them during lectures
 
-	Background:
-	 # Given I am logged in
-	 Given I am logged in as a user
+  Background:
+   # Given I am logged in
+   Given I am logged in as a user
 
-	Scenario: List questions
+  Scenario: List questions
     Given there exists a single choice question with the name "test question" for "example@example.com"
     When I go to the questions page
     Then I should see "test question"
@@ -52,7 +52,6 @@ Feature: Pre-define questions
     And I go to the questions page
     And I should see "my edited test question"
 
-  @wip
   @javascript
   Scenario: Delete questions
     Given there exists a single choice question with the name "my test question" for "example@example.com"
@@ -61,7 +60,7 @@ Feature: Pre-define questions
     And I follow "delete" and confirm the popup
     And I go to the questions page
     Then I should not see "my test question"
-  
+
   @javascript
   Scenario: Tag questions
     Given there exists a single choice question with the name "my test question" for "example@example.com"
@@ -102,11 +101,10 @@ Feature: Pre-define questions
     And I follow "show"
     And I follow "Start question from catalogue"
     And I add the first question in the list
-    And I go to the event's page
     Then I should see "my test question"
 
   @javascript
-  Scenario: Transform single into multiple choice question 
+  Scenario: Transform single into multiple choice question
     Given there exists a single choice question with the name "my test question" for "example@example.com"
     And I go to the questions page
     And I follow "my test question"
@@ -117,7 +115,7 @@ Feature: Pre-define questions
     Then I should see "Type: Multiple Choice"
 
   @javascript
-  Scenario: Transform multiple into single choice question 
+  Scenario: Transform multiple into single choice question
     Given there exists a multiple choice question with the name "my test question" for "example@example.com"
     And I go to the questions page
     And I follow "my test question"
@@ -139,6 +137,7 @@ Feature: Pre-define questions
     And I hit enter in "mail_for_collaborators"
     And I wait a second
     And I press "single_question_submit"
+    And I go to the question's page
     And I am logged in as the user with email "test_share2@example.com"
     And I go to the question's page
     Then I should see "shared question"

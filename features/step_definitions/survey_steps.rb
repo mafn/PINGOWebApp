@@ -37,3 +37,19 @@ Given /^the survey is running$/ do
     raise "No current @survey obj found"
   end
 end
+
+Given /^the survey is stopped$/ do
+  if @survey
+    @survey.service.stop!
+  else
+    raise "No current @survey obj found"
+  end
+end
+
+Given /^the survey ends in 2s$/ do
+  if @survey
+    @survey.service.stop!(2)
+  else
+    raise "No current @survey obj found"
+  end
+end

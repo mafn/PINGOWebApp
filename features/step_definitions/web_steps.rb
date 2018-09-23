@@ -9,6 +9,13 @@ When /^show me the screenshot$/ do
   screenshot_and_open_image
 end
 
+When /^I reload the page$/ do
+  visit current_path
+end
+
+When /^I submit the form$/ do
+  page.evaluate_script("document.forms[0].submit()")
+end
 Then /^the "([^"]*)" field(?: within (.*))? should contain "([^"]*)"$/ do |field, parent, value|
   with_scope(parent) do
     field = find_field(field)
@@ -125,12 +132,8 @@ Then /^show me the page$/ do
 end
 
 When /^I follow "([^"]*)" and confirm the popup$/ do |link|
-  page.evaluate_script "window.original_confirm_function = window.confirm"
-  page.evaluate_script "window.confirm = function(msg) { window.lastConfirmMsg = msg; }"
   click_link link
-  last_confirm_msg = page.evaluate_script "window.lastConfirmMsg"
-  assert_not_empty last_confirm_msg
-  page.evaluate_script "window.confirm = window.original_confirm_function"
+  page.driver.browser.accept_js_confirms
 end
 
 Then /^show me a screenshot$/ do

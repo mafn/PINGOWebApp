@@ -58,6 +58,11 @@ Given /^I exist as an unconfirmed user$/ do
   create_unconfirmed_user
 end
 
+Given /^I am Admin$/ do
+  create_admin
+  sign_in
+end
+
 ### WHEN ###
 When /^I sign in with valid credentials$/ do
   create_visitor
@@ -111,6 +116,11 @@ When /^I sign in with a wrong password$/ do
   sign_in
 end
 
+When /^I sign in with my new credentials$/ do
+  @visitor = @visitor.merge(:password => "newpass")
+  sign_in
+end
+
 When /^I edit my account details$/ do
   click_link "Settings"
   fill_in "First name", :with => "newname"
@@ -118,19 +128,94 @@ When /^I edit my account details$/ do
   click_button "Update"
 end
 
+When /^I change my password and use wrong old password$/ do
+  click_link "Settings"
+  fill_in "Current password", :with => "wrongpass"
+  fill_in "Password", :with => "newpass"
+  fill_in "Password confirmation", :with => "newpass"
+  click_button "Update"
+end
+
+When /^I change my password and use wrong password confirmation$/ do
+  click_link "Settings"
+  fill_in "Current password", :with => @visitor[:password]
+  fill_in "Password", :with => "newpass"
+  fill_in "Password confirmation", :with => "wrongpass"
+  click_button "Update"
+end
+
+When /^I change my password$/ do
+  click_link "Settings"
+  fill_in "Current password", :with => @visitor[:password]
+  fill_in "Password", :with => "newpass"
+  fill_in "Password confirmation", :with => "newpass"
+  click_button "Update"
+end
+
 When /^I look at the list of users$/ do
   visit "/admin/users"
 end
 
+When /^I visit the user's admin page$/ do
+  finduserbymail "test_updater@example.com"
+  visit "/admin/users/" + @user[:id]
+end
+
+When /^I edit the user's account details$/ do
+  click_link "Edit"
+  fill_in "User first name:", :with => "newname"
+  fill_in "User faculty:", :with => "Newfaculty"
+  click_button "Save"
+end
+
+When /^I edit the user's password$/ do
+  click_link "Edit"
+  fill_in "Password:", :with => "newpass"
+  fill_in "...confirm:", :with => "newpass"
+  click_button "Save"
+end
+
+When /^I log in as the user with email "(.*?)"$/ do |email|
+  @visitor[:email] = email
+  @visitor[:password] = "newpass"
+  sign_in
+end
+
+When /^I visit the Admin's user creation page$/ do
+  visit "admin/users/new"
+end
+
+When /^I fill out the user creation page$/ do
+  fill_in "Password:", :with => "newpass"
+  fill_in "...confirm:", :with => "newpass"
+  fill_in "E-Mail:", :with => "admincreated@example.com"
+  fill_in "User first name:", :with => "Admin's"
+  fill_in "User last name:", :with => "Beispiel"
+  fill_in "User faculty:", :with => "BeispielFak"
+  fill_in "User organization:", :with => "BeispielOrg"
+  click_button "Save"
+end
+
+When /^I fill out nothing in the user creation page$/ do
+  click_button "Save"
+end
+
+When /^I take the tour$/ do
+  click_link "Take the tour"
+end
+
+When /^I click next$/ do
+  page.find(:xpath, '//div[@class="joyride-tip-guide"][@data-index="0"]/div/a').click
+end
 ### THEN ###
 Then /^I should be signed in$/ do
   page.should have_content "Logout"
-  #page.should_not have_content "Sign up"
+  page.should_not have_content "Sign up"
   page.should_not have_content "Login"
 end
 
 Then /^I should be signed out$/ do
-  # page.should have_content "Sign up"
+  page.should have_content "Sign up"
   page.should have_content "Login"
   page.should_not have_content "Logout"
 end
@@ -144,7 +229,7 @@ Then /^I see a successful sign in message$/ do
 end
 
 Then /^I should see a successful sign up message$/ do
-  page.should have_content "Signed up successfully"
+  page.should have_content "You have signed up successfully."
 end
 
 Then /^I should see an invalid email message$/ do
@@ -156,11 +241,11 @@ Then /^I should see a missing password message$/ do
 end
 
 Then /^I should see a missing password confirmation message$/ do
-  page.should have_content "Password doesn't match confirmation"
+  page.should have_content "Password confirmation doesn't match Password"
 end
 
 Then /^I should see a mismatched password message$/ do
-  page.should have_content "Password doesn't match confirmation"
+  page.should have_content "Password confirmation doesn't match Password"
 end
 
 Then /^I should see a signed out message$/ do
@@ -168,16 +253,40 @@ Then /^I should see a signed out message$/ do
 end
 
 Then /^I see an invalid login message$/ do
-  page.should have_content "Invalid email or password"
+  page.should have_content "Invalid email address or password."
 end
 
 Then /^I should see an account edited message$/ do
-  page.should have_content "You updated your account successfully."
+  page.should have_content "Your account has been updated successfully."
+end
+
+Then /^I should see an current password is invalid message$/ do
+  page.should have_content "Current password is invalid"
+end
+
+Then /^I should see a password changed message$/ do
+  page.should have_content "Your account has been updated successfully."
 end
 
 Then /^I should see my name$/ do
   create_user
   page.should have_content @user[:first_name]
+end
+
+Then /^I should see a list of users$/ do
+  page.should have_content "Listing users"
+  page.should have_selector("td", text: @user[:first_name] + " " + @user[:last_name])
+  page.should have_selector("td", text: @user[:organization] + " " + @user[:faculty])
+end
+
+Then /^I should see my email$/ do
+  page.should have_content @user[:email]
+end
+
+Then /^I should see the updated account details$/ do
+  page.should have_content "Listing users"
+  page.should have_selector("td", text: "newname " + @user[:last_name])
+  page.should have_selector("td", text: @user[:organization] + " Newfaculty")
 end
 
 ### UTILITY METHODS ###
@@ -204,6 +313,7 @@ def create_admin
               :password => "please",
               :admin => true,
               :password_confirmation => "please"}
+  @user = FactoryGirl.create(:user, email: @visitor[:email], admin: true)
 end
 
 def create_visitor2
@@ -220,6 +330,10 @@ end
 
 def find_user
   @user ||= User.where(:email => @visitor[:email]).first
+end
+
+def finduserbymail(mail)
+  @user = User.where(:email => mail).first
 end
 
 def create_unconfirmed_user
