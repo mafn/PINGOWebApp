@@ -1,20 +1,20 @@
 class HomeController < ApplicationController
   layout :detect_browser
   #caches_action :index, layout: false, expires_in: 1.hour
-  
+
   if defined?(NewRelic)
     newrelic_ignore_apdex only: [:stats]
   end
 
   def index
     if user_signed_in?
-       @posts = Rails.cache.fetch("pingo.blogs", :expires_in => 4.hours) do
-         get_blog_posts("http://blogs.uni-paderborn.de/pingo/feed/")
+      @posts = Rails.cache.fetch("pingo.blogs", :expires_in => 4.hours) do
+        get_blog_posts("http://blogs.uni-paderborn.de/pingo/feed/")
       end
     end
   end
 
-# :nocov:
+  # :nocov:
   def stats
     @users = User.count
     @sessions = Event.count
@@ -24,7 +24,7 @@ class HomeController < ApplicationController
     @public_questions = Question.where(public: true).count
     @votes = Rails.cache.fetch("pingo.stats.votes_sum", :expires_in => 30.minutes) do
       Survey.only(:voters).map { |s| s.voters ? s.voters.count : 0 }.sum
-   end
+    end
     @invitations = Metric.where(name: "invitation").count
     @newsletter_users = User.where(newsletter: true).count
 
@@ -38,12 +38,13 @@ class HomeController < ApplicationController
           repeated_surveys: @repeated_surveys,
           questions: @questions,
           public_questions: @public_questions,
-          votes: @votes
+          votes: @votes,
         }
       end
     end
   end
-# :nocov:
+
+  # :nocov:
 
   def switch_view
     if params[:mobile] == "0"
@@ -61,6 +62,7 @@ class HomeController < ApplicationController
   end
 
   private
+
   def get_blog_posts(url)
     begin
       feed = nil
@@ -82,5 +84,4 @@ class HomeController < ApplicationController
       []
     end
   end
-
 end

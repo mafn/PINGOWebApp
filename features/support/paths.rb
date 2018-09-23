@@ -9,38 +9,32 @@ module NavigationHelpers
     case page_name
 
     when /the home\s?page/
-      '/'
-
+      "/"
     when /the sign up page/
-      '/users/sign_up'
-
+      "/users/sign_up"
     when /the sign in page/
-      '/users/sign_in'
-      
+      "/users/sign_in"
     when /the event's page/
       event_path(@event)
-
     when /the event's edit page/
       edit_event_path(@event)
-
     when /the question's page/
       question_path(@question)
 
-
-    # Add more mappings here.
-    # Here is an example that pulls values out of the Regexp:
-    #
-    #   when /^(.*)'s profile page$/i
-    #     user_profile_path(User.find_by_login($1))
+      # Add more mappings here.
+      # Here is an example that pulls values out of the Regexp:
+      #
+      #   when /^(.*)'s profile page$/i
+      #     user_profile_path(User.find_by_login($1))
 
     else
       begin
         page_name =~ /the (.*) page/
         path_components = $1.split(/\s+/)
-        self.send(path_components.push('path').join('_').to_sym)
+        self.send(path_components.push("path").join("_").to_sym)
       rescue Object => e
         raise "Can't find mapping from \"#{page_name}\" to a path.\n" +
-          "Now, go and add a mapping in #{__FILE__}"
+                "Now, go and add a mapping in #{__FILE__}"
       end
     end
   end

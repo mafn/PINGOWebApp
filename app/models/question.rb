@@ -2,7 +2,7 @@ class Question
   include Mongoid::Document
   include Mongoid::Timestamps
   include Mongoid::Taggable
-  
+
   include ActiveModel::ForbiddenAttributesProtection # #rails4
 
   field :name, type: String
@@ -10,11 +10,11 @@ class Question
   field :description, type: String
   field :public, type: Boolean, default: false
   field :settings, type: Hash, default: {}
-  
+
   def self.question_types
     ["multi", "single", "text", "exit_q", "number", "match", "order", "category"]
   end
-  
+
   validates :type, inclusion: {in: Question.question_types}
   validates_presence_of :name
 
@@ -49,7 +49,7 @@ class Question
 
   # this is where we setup getting the service objects
   def service
-    case type 
+    case type
     when "text"
       TextQuestion.new(self)
     when "single"
@@ -73,10 +73,9 @@ class Question
     self.question_comments
   end
 
-
   def to_survey
     survey = Survey.new
-    survey.name = self.name 
+    survey.name = self.name
     survey.type = self.type
     question_options.each do |qo|
       survey.options.push qo.to_option
@@ -102,7 +101,7 @@ class Question
   def can_be_accessed_by?(_user)
     (collaborators + [user]).include?(_user) || _user.admin
   end
-  
+
   def self.new_from_existing(original_question)
     Question.new.tap do |question|
       question.name = original_question.name
@@ -111,9 +110,10 @@ class Question
       end
       original_question.answer_pairs.each do |pair|
         question.answer_pairs.build(
-          answer1: pair.answer1, 
+          answer1: pair.answer1,
           answer2: pair.answer2,
-          correct: pair.correct)
+          correct: pair.correct,
+        )
       end
       original_question.order_options.each do |option|
         question.order_options.build(name: option.name, position: option.position)
@@ -134,16 +134,16 @@ class Question
 
   def self.public_question_tags(type = nil)
     if type
-      self.where(public:true).in(type: type).flat_map(&:tags_array).uniq
+      self.where(public: true).in(type: type).flat_map(&:tags_array).uniq
     else
-      self.where(public:true).flat_map(&:tags_array).uniq
+      self.where(public: true).flat_map(&:tags_array).uniq
     end
   end
 
   def self.recently_commented
     self.where("question_comments.created_at" => {"$gte" => Time.now - 14.days}).desc("question_comments.created_at")
   end
-  
+
   # for FORM
   def collaborators_form
     self.collaborators.map(&:id).join(",")
@@ -156,7 +156,7 @@ class Question
   end
 
   def delete_all_false_answer_pairs
-    if(self.answer_pairs.any?)
+    if (self.answer_pairs.any?)
       self.answer_pairs.where(correct: false).each do |pair|
         pair.delete
       end
@@ -165,11 +165,11 @@ class Question
 
   # adds all wrong answer pairs to the collection answer_pairs of the just saved match question
   def fill_up_answer_pairs
-    if(self.answer_pairs.any?)
+    if (self.answer_pairs.any?)
       self.answer_pairs.where(correct: true).each do |pair1|
         self.answer_pairs.where(correct: true).each do |pair2|
-          if(pair1.answer1 != pair2.answer1)
-            if(pair1.answer2 != pair2.answer2)
+          if (pair1.answer1 != pair2.answer1)
+            if (pair1.answer2 != pair2.answer2)
               self.answer_pairs.create(:answer1 => pair1.answer1, :answer2 => pair2.answer2, :correct => false)
             end
           end
@@ -177,5 +177,4 @@ class Question
       end
     end
   end
-
 end

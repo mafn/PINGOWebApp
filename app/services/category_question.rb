@@ -16,5 +16,4 @@ class CategoryQuestion < GenericQuestion
   def to_survey
     CategorySurvey.new(self.question.to_survey)
   end
-
 end

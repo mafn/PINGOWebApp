@@ -4,7 +4,7 @@ class SingleChoiceQuestion < ChoiceQuestion
     super
     @question.type = "single" unless self.question.persisted?
   end
-  
+
   def form_partial
     "single_form"
   end

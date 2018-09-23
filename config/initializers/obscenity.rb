@@ -1,3 +1,3 @@
 Obscenity.configure do |config|
-  config.blacklist   = :international
+  config.blacklist = :international
 end

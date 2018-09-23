@@ -1,9 +1,10 @@
-  <table id="result-table" height="300" class="result-table table table-bordered">
-    <thead>
-      <tr>
-          <% numberOfOptions = survey.order_options.length %>
-          <% columnWidthPercentage = number_to_percentage(1.to_f / (1 + numberOfOptions).to_f * 100.to_f, :precision => 0) %>
-          <th style="width: <%= columnWidthPercentage %>;">Position</th>
+  
+<table id="result-table" height="300" class="result-table table table-bordered">
+  <thead>
+    <tr>
+      <% numberOfOptions = survey.order_options.length %>
+      <% columnWidthPercentage = number_to_percentage(1.to_f / (1 + numberOfOptions).to_f * 100.to_f, :precision => 0) %>
+      <th style="width: <%= columnWidthPercentage %>;">Position</th>
           <% for index in 1..numberOfOptions %>
             <th scope="col" style="width: <%= columnWidthPercentage %>;"><%= index %></th>
           <% end %>
@@ -31,20 +32,20 @@
             <td class="result-table-td toCorrectSwitchable" style="height: <%= rowHeightPercentage %>;">
               <div>
                 <div style="height:<%= percentage %>;" />
-                <p><%= percentage %></p>
-              </div>
-            </td>
-          <% else %>
-            <td class="result-table-td" style="height: <%= rowHeightPercentage %>;">
+      <p><%= percentage %></p>
+    </div>
+  </td>
+<% else %>
+  <td class="result-table-td" style="height: <%= rowHeightPercentage %>;">
               <div>  
                 <div style="height:<%= percentage %>;" />
-                <p><%= percentage %></p>
-              </div>
-            </td>
-          <% end %>
-          <% currentPosition += 1 %>
-        <% end %>
-      </tr>
-      <% end %>
-    </tbody>
-  </table>
+  <p><%= percentage %></p>
+</div>
+</td>
+<% end %>
+<% currentPosition += 1 %>
+<% end %>
+</tr>
+<% end %>
+</tbody>
+</table>

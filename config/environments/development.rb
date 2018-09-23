@@ -10,7 +10,7 @@ Eclickr::Application.configure do
   config.whiny_nils = true
 
   # Show full error reports and disable caching
-  config.consider_all_requests_local       = true
+  config.consider_all_requests_local = true
   config.action_controller.perform_caching = false
 
   # Don't care if the mailer can't send
@@ -27,17 +27,16 @@ Eclickr::Application.configure do
 
   # Expands the lines which load the assets
   config.assets.debug = true
-  
-  config.action_mailer.default_url_options = { :host => 'localhost:3000' }
+
+  config.action_mailer.default_url_options = {:host => "localhost:3000"}
 
   # Raise exception on mass assignment protection for Active Record models
   # config.active_record.mass_assignment_sanitizer = :strict
- 
+
   # Log the query plan for queries taking more than this (works
   # with SQLite, MySQL, and PostgreSQL)
   # config.active_record.auto_explain_threshold_in_seconds = 0.5
 end
-
 
 # Juggernaut Server
 ENV["USE_JUGGERNAUT"] = "false"
@@ -51,15 +50,16 @@ ENV["ANALYTICS"] = "false"
 
 # Pretty print for console output
 require "pp"
+
 def pprint(arg)
   pp arg
 end
 
 # Git version display in logo
 begin
-  repo = Grit::Repo.new(Rails.root + '.git')
+  repo = Grit::Repo.new(Rails.root + ".git")
   last_commit = repo.commits.first
-  ENV['COMMIT_HASH'] = last_commit.id+"/"+last_commit.authored_date.to_s
+  ENV["COMMIT_HASH"] = last_commit.id + "/" + last_commit.authored_date.to_s
 rescue
-  ENV['COMMIT_HASH'] = 'unknown'
+  ENV["COMMIT_HASH"] = "unknown"
 end

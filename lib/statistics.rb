@@ -6,49 +6,49 @@ class Statistics
   def self.median(arr)
     sorted = arr.sort
     if arr.length.odd?
-      sorted[arr.length/2]
+      sorted[arr.length / 2]
     else
-      (sorted[arr.length/2 - 1] + sorted[arr.length/2]).to_f / 2
+      (sorted[arr.length / 2 - 1] + sorted[arr.length / 2]).to_f / 2
     end
   end
 
   def self.stdev(arr)
     if arr.size > 1
-     standard_deviation arr
-   else
-    0
+      standard_deviation arr
+    else
+      0
     end
   end
 
   def self.histogram(arr, no_buckets = 10)
     # TODO: find optimal no of buckets and filter outliers using Grubb's Test
-      no_buckets = arr.length if no_buckets > arr.length
-      bins, freqs = arr.histogram(no_buckets)
-      bins.map! do |i|
-       Statistics.sigfig_to_s(i,2) 
-     end
-      bins.zip freqs
+    no_buckets = arr.length if no_buckets > arr.length
+    bins, freqs = arr.histogram(no_buckets)
+    bins.map! do |i|
+      Statistics.sigfig_to_s(i, 2)
+    end
+    bins.zip freqs
   end
 
   def self.cluster(arr, threshold = nil)
-    threshold = arr.flatten.group_by{|x|x}.values.map(&:size).sort.last unless threshold
+    threshold = arr.flatten.group_by { |x| x }.values.map(&:size).sort.last unless threshold
     cl = Clusterer.new(arr)
     clusters = cl.clustering
-    recursive_cluster(cl.clusters.first.items, threshold, []) 
-  end 
+    recursive_cluster(cl.clusters.first.items, threshold, [])
+  end
 
-   def self.sigfig_to_s(number, digits)
+  def self.sigfig_to_s(number, digits)
     f = sprintf("%.#{digits - 1}e", number).to_f
     i = f.to_i
     (i == f ? i : f).to_s
   end
 
   private
-  
+
   def self.standard_deviation(array)
     result = 0
     total = array.sum
-  
+
     if array.size >= 1
       mean = avg array
       total_distance_from_mean = array.map do |i|
@@ -62,17 +62,14 @@ class Statistics
 
   def self.recursive_cluster(arr, threshold, agg)
     arr.each do |cluster|
-        if cluster.respond_to? :flatten and cluster.flatten.size > threshold
-
-          recursive_cluster(cluster, threshold, agg)
-        else
-          cluster = cluster.flatten if cluster.respond_to? :flatten
-          agg << cluster
-        end
+      if cluster.respond_to? :flatten and cluster.flatten.size > threshold
+        recursive_cluster(cluster, threshold, agg)
+      else
+        cluster = cluster.flatten if cluster.respond_to? :flatten
+        agg << cluster
       end
-    
+    end
+
     agg.sort
   end
-
-
 end

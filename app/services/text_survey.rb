@@ -1,9 +1,7 @@
 class TextSurvey < GenericSurvey
-
   ONE_ANSWER = "one_answer"
   THREE_ANSWERS = "up_to_three_answers"
   MULTI_ANSWERS = "multiple_answers"
-
 
   def vote(voter, option)
     if running?(false)
@@ -26,7 +24,7 @@ class TextSurvey < GenericSurvey
 
   def raw_results
     if self.total_votes > 0 && self.voters_hash
-      self.voters_hash['words'].map do |word|
+      self.voters_hash["words"].map do |word|
         OpenStruct.new voter_id: nil, answer: word
       end
     else
@@ -66,14 +64,12 @@ class TextSurvey < GenericSurvey
   def word_counts(locale = :en)
     if voters_hash and voters_hash["words"]
       Hash[@survey.voters_hash["words"].reject do |word|
-        Obscenity.profane?(word)
-      end.group_by(&:capitalize).map do |k, v|
-        [k, v.length]
-      end]
+             Obscenity.profane?(word)
+           end.group_by(&:capitalize).map do |k, v|
+             [k, v.length]
+           end]
     else
       {}
     end
   end
-
 end
-

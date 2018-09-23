@@ -1,8 +1,7 @@
 class QuestionCommentsController < ApplicationController
+  before_filter :load_and_check_access
 
-before_filter :load_and_check_access
-
-def create
+  def create
     @comment = @question.question_comments.build(comment_params)
     respond_to do |format|
       if @comment.save
@@ -13,7 +12,7 @@ def create
         format.js { render json: @comment.errors, status: :unprocessable_entity }
       end
     end
-end
+  end
 
   def index
     respond_to do |format|
@@ -22,10 +21,10 @@ end
     end
   end
 
-protected
+  protected
 
   def comment_params
-  	params.require(:question_comment).permit(:text, :survey_id)
+    params.require(:question_comment).permit(:text, :survey_id)
   end
 
   def load_and_check_access
@@ -33,5 +32,4 @@ protected
     render :text => t("messages.no_access_to_question"), status: :forbidden and return false unless @question.can_be_accessed_by?(current_user)
     true
   end
-
 end

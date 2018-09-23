@@ -1,5 +1,5 @@
-require 'ipaddr'
-require 'bigdecimal'
+require "ipaddr"
+require "bigdecimal"
 require "statistics"
 require "cluster"
 require "clusterer"

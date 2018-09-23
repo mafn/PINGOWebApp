@@ -10,13 +10,14 @@ class ApplicationController < ActionController::Base
   end
 
   private
-  MOBILE_BROWSERS = ["android", "ipod", "ipad", "iphone", "opera mini", "blackberry", "palm","hiptop","avantgo","plucker", "xiino","blazer","elaine", "windows ce; ppc;", "windows ce; smartphone;","windows ce; iemobile", "up.browser","up.link","mmp","symbian","smartphone", "midp","wap","vodafone","o2","pocket","kindle", "mobile","pda","psp","treo"]
+
+  MOBILE_BROWSERS = ["android", "ipod", "ipad", "iphone", "opera mini", "blackberry", "palm", "hiptop", "avantgo", "plucker", "xiino", "blazer", "elaine", "windows ce; ppc;", "windows ce; smartphone;", "windows ce; iemobile", "up.browser", "up.link", "mmp", "symbian", "smartphone", "midp", "wap", "vodafone", "o2", "pocket", "kindle", "mobile", "pda", "psp", "treo"]
 
   protected
 
-  def default_url_options(options={})
+  def default_url_options(options = {})
     if params[:tour] == "true" # keep tour mode turned on while surfing around
-      { :tour => "true" }
+      {:tour => "true"}
     else
       {}
     end
@@ -32,7 +33,7 @@ class ApplicationController < ActionController::Base
   end
 
   def is_mobile?
-    agent = (request.headers["HTTP_USER_AGENT"]||"").downcase
+    agent = (request.headers["HTTP_USER_AGENT"] || "").downcase
     MOBILE_BROWSERS.each do |m|
       return true if agent.match(m)
     end
@@ -44,24 +45,25 @@ class ApplicationController < ActionController::Base
   def is_device?(type)
     request.user_agent.to_s.downcase.include?(type.to_s.downcase)
   end
+
   helper_method :is_device?
 
   def is_numeric?(i)
-      i.to_i.to_s == i || i.to_f.to_s == i
+    i.to_i.to_s == i || i.to_f.to_s == i
   end
 
   def get_or_create_voter_id
     if user_signed_in?
       return current_user.voter_id
     else
-      cookies.permanent[:voter_id] = @@uuid.generate  if cookies[:voter_id].blank?
+      cookies.permanent[:voter_id] = @@uuid.generate if cookies[:voter_id].blank?
       return cookies[:voter_id]
     end
   end
 
   # use as a filter
   def check_ip
-    upb_net = ENV["ORG_SUBNET"]||"131.234.0.0/16"
+    upb_net = ENV["ORG_SUBNET"] || "131.234.0.0/16"
     upb = IPAddr.new(upb_net)
     @upb_ip = (upb === request.remote_ip)
   end
@@ -108,5 +110,4 @@ class ApplicationController < ActionController::Base
       Rails.logger.info "set locale to #{@survey.event.custom_locale}"
     end
   end
-
 end

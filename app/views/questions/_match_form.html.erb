@@ -4,20 +4,20 @@
     <div>
       <%= form.input :name, input_html: {class: "input-xxlarge"} %>
     </div>
-      <%= form.hidden_field :type, value: "match" %>
-      <%= hidden_field_tag :redirect_to_session, params[:redirect_to_session] %>
+    <%= form.hidden_field :type, value: "match" %>
+    <%= hidden_field_tag :redirect_to_session, params[:redirect_to_session] %>
     <div>
       <%= form.input :tags, input_html: { class:  "input-xxlarge" , placeholder: "Tags" }, required: false %>
       <% if current_user.question_tags && !current_user.question_tags.blank? %>
-      <%= select_tag "tags", options_for_select([[t("questions.add_from_your_tags"), '']] + current_user.question_tags.sort.map{ |t| [t, t]}), id: "match_select_tag" %>
-      <br>&nbsp;
+        <%= select_tag "tags", options_for_select([[t("questions.add_from_your_tags"), '']] + current_user.question_tags.sort.map{ |t| [t, t]}), id: "match_select_tag" %>
+        <br>
+        &nbsp;
       <% end %>
     </div>
     <div>
       <label for="public" class="checkbox inline"><%= form.check_box :public, :class => "checkbox inline" %><%= t("public") %></label>
     </div>
   </div>
-
   <h3><%= t("surveys.edit.answer_pairs_for_match_survey") %></h3>
   <div id="options" class="row-fluid">
     <div class="span10">
@@ -36,12 +36,12 @@
   <%= form.hidden_field :collaborators_form, class:"collaborators-form" %>
   <%= form.submit class: "btn btn-primary", id: "single_question_submit" %>
   <span style="margin-left:20px;">
-    <% if params[:redirect_to_session] %>  
+    <% if params[:redirect_to_session] %>
       <label for="also_start_question" class="checkbox"><%= check_box_tag "also_start_question", "false", false %> <%= t "questions.start_in_session" %>
       </label><br>
-      </span> 
-    <% end %>
-  </span>
+    </span>
+  <% end %>
+</span>
 <% end %>
 <% content_for :javascript do %>
   <script>
@@ -49,11 +49,11 @@
       $("#match_question_tags").tagsManager({ // http://welldonethings.com/tags/manager
         prefilled: "<%= question.tags %>",
         hiddenTagListName: "match_question[tags]",
-		    preventSubmitOnEnter: true
+        preventSubmitOnEnter: true
       });
       $("#match_select_tag").change(function(){
-		    $("#match_question_tags").tagsManager("pushTag", $("#match_select_tag").val());
-		    $("#match_select_tag option:first").attr('selected',true);
+        $("#match_question_tags").tagsManager("pushTag", $("#match_select_tag").val());
+        $("#match_select_tag option:first").attr('selected',true);
       });
     });
   </script>

@@ -16,5 +16,4 @@ class MatchQuestion < GenericQuestion
   def to_survey
     MatchSurvey.new(self.question.to_survey)
   end
-
 end

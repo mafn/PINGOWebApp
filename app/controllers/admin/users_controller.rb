@@ -1,7 +1,7 @@
 # :nocov:
 class Admin::UsersController < ApplicationController
-  require 'csv'
-  
+  require "csv"
+
   if defined?(NewRelic)
     newrelic_ignore
   end
@@ -19,9 +19,9 @@ class Admin::UsersController < ApplicationController
     start_date = (Date.today - 1.month)
     conditions = User.where(:created_at.gte => start_date.to_time.utc).selector
     registrations_mr = User.collection.group(:keyf => "function(doc) { d = new Date(doc.created_at); return {month: d.getMonth() + 1, day: d.getDate() }; }",
-                    :initial => { :registrations => 0 },
-                    :reduce => "function(doc,prev) { prev.registrations += +1; }",
-                    :cond => conditions)
+                                             :initial => {:registrations => 0},
+                                             :reduce => "function(doc,prev) { prev.registrations += +1; }",
+                                             :cond => conditions)
 
     # smthg like: select day(users.created_at) as d, month(users.created_at) as m, sum(*) from users where created_at > :x group by (d, m)
 
@@ -37,7 +37,7 @@ class Admin::UsersController < ApplicationController
 
     respond_to do |format|
       format.html # index.html.erb
-      format.json { render json: {users: @users, registrations: @registrations } }
+      format.json { render json: {users: @users, registrations: @registrations} }
     end
   end
 
@@ -76,7 +76,7 @@ class Admin::UsersController < ApplicationController
 
     respond_to do |format|
       if @user.save
-        format.html { redirect_to admin_user_path(@user), notice: 'User was successfully created.' }
+        format.html { redirect_to admin_user_path(@user), notice: "User was successfully created." }
         format.json { render json: @user, status: :created, location: @user }
       else
         format.html { render action: "new" }
@@ -100,7 +100,7 @@ class Admin::UsersController < ApplicationController
 
     respond_to do |format|
       if @user.update_attributes(params[:user])
-        format.html { redirect_to admin_user_path(@user), notice: 'User was successfully updated.' }
+        format.html { redirect_to admin_user_path(@user), notice: "User was successfully updated." }
         format.json { head :ok }
       else
         format.html { render action: "edit" }
@@ -133,6 +133,6 @@ class Admin::UsersController < ApplicationController
       end
     end
   end
-
 end
+
 # :nocov:

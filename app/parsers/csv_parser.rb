@@ -1,9 +1,9 @@
 require "csv"
-require 'logger'
-@@log = Logger.new('log.txt')
+require "logger"
+@@log = Logger.new("log.txt")
 @@log.debug "Log file created"
-class CsvParser
 
+class CsvParser
   def export(questions)
     csv_string = CSV.generate(quote_char: '"') do |csv|
       # CSV-Header einfügen
@@ -14,7 +14,7 @@ class CsvParser
         # Hinzufügen von tags, falls vorhanden
         unless question.tags.nil? || question.tags.empty?
           question.tags.split(",").each do |tag|
-            if current[2]==""
+            if current[2] == ""
               current[2] = tag
             else
               current[2] = current[2] + ";" + tag
@@ -31,25 +31,25 @@ class CsvParser
         if question.type == "single" || question.type == "multi"
           question.question_options.each do |option|
             current << option.name
-            correct_options << option_number if option.correct  # Nummern der korrekten Antworten merken   
+            correct_options << option_number if option.correct  # Nummern der korrekten Antworten merken
             option_number = option_number + 1
           end
-        elsif question.type == 'text'
+        elsif question.type == "text"
           answer_type = question.service.settings["answers"]
           if answer_type == TextSurvey::ONE_ANSWER
-            correct_options << '1'
+            correct_options << "1"
           elsif answer_type == TextSurvey::THREE_ANSWERS
-            correct_options << '3'
+            correct_options << "3"
           end
-        elsif question.type == 'match'
+        elsif question.type == "match"
           question.answer_pairs.where(correct: true).each do |pair|
-            current << pair.answer1 + ' - ' + pair.answer2
+            current << pair.answer1 + " - " + pair.answer2
           end
-        elsif question.type == 'order'
+        elsif question.type == "order"
           question.order_options.each do |option|
             current << option.position.to_s + ") " + option.name
           end
-        elsif question.type == 'category'
+        elsif question.type == "category"
           question.categories.each do |category|
             current << category.name + "|||" + category.sub_words
           end
@@ -85,7 +85,7 @@ class CsvParser
             next
           else
             #Frage erstellen
-            q = Question.new(type:question[0], name:question[1]).service
+            q = Question.new(type: question[0], name: question[1]).service
 
             # Hinzufügen von tags, die nur für diese Frage gelten sollen
             unless question[2].nil? || question[2].empty?
@@ -109,16 +109,16 @@ class CsvParser
             if question[0] == "single" || question[0] == "text"
               answers = [question[3]]
             elsif question[0] == "multi" || question[0] == "match"
-              answers =  question[3].split(";")
+              answers = question[3].split(";")
             end
 
             if question[0] == "match"
               question.drop(4).each do |pair| # Die ersten vier Elemente beinhalten keine Antworten
-                q.answer_pairs << AnswerPair.new(answer1: pair.split(' - ')[0], answer2: pair.split(' - ')[1])
+                q.answer_pairs << AnswerPair.new(answer1: pair.split(" - ")[0], answer2: pair.split(" - ")[1])
               end
             elsif question[0] == "order"
               question.drop(4).each do |option|
-                q.order_options << OrderOption.new(name: option.split(') ')[1], position: option.split(') ')[0])
+                q.order_options << OrderOption.new(name: option.split(") ")[1], position: option.split(") ")[0])
               end
             elsif question[0] == "category"
               question.drop(4).each do |categoryAndSubWords|
@@ -139,9 +139,9 @@ class CsvParser
 
             #Korrekte Frageoptionen setzen oder bei Textfragen die korrekten Settings setzen
             if q.type == "text"
-              if answers.first == '1'
+              if answers.first == "1"
                 q.add_setting "answers", TextSurvey::ONE_ANSWER
-              elsif answers.first == '3'
+              elsif answers.first == "3"
                 q.add_setting "answers", TextSurvey::THREE_ANSWERS
               elsif answers.first.blank?
                 q.add_setting "answers", TextSurvey::MULTI_ANSWERS
@@ -149,7 +149,7 @@ class CsvParser
             else
               if answers
                 answers.each do |answer|
-                  q.question_options[answer.to_i-1].correct = true
+                  q.question_options[answer.to_i - 1].correct = true
                 end
               end
             end
@@ -163,13 +163,13 @@ class CsvParser
           end
           row = row + 1 # Fertig mit der Zeile
         end
-          # Falls etwas mit der CSV nicht stimmt
+        # Falls etwas mit der CSV nicht stimmt
       rescue CSV::MalformedCSVError
         error_info = "Zeile/Row #{row}"
-        begin 
+        begin
           error_info += " - " + csv_string.split("\n")[row].split(separator)[1]
-        rescue; end
-          errors << {"type" => "unknown_error", "text" => error_info}
+        rescue;         end
+        errors << {"type" => "unknown_error", "text" => error_info}
       end
     rescue Exception
       # Fallback für alle nicht behandelten Fehler

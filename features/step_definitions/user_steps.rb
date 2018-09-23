@@ -18,7 +18,7 @@ end
 
 ### GIVEN ###
 Given /^I am not logged in$/ do
-  visit '/users/sign_out'
+  visit "/users/sign_out"
 end
 
 Given /^I am logged in$/ do
@@ -65,7 +65,7 @@ When /^I sign in with valid credentials$/ do
 end
 
 When /^I sign out$/ do
-  visit '/users/sign_out'
+  visit "/users/sign_out"
 end
 
 When /^I sign up with valid user data$/ do
@@ -98,7 +98,7 @@ When /^I sign up with a mismatched password confirmation$/ do
 end
 
 When /^I return to the site$/ do
-  visit '/'
+  visit "/"
 end
 
 When /^I sign in with a wrong email$/ do
@@ -119,7 +119,7 @@ When /^I edit my account details$/ do
 end
 
 When /^I look at the list of users$/ do
-  visit '/admin/users'
+  visit "/admin/users"
 end
 
 ### THEN ###
@@ -130,7 +130,7 @@ Then /^I should be signed in$/ do
 end
 
 Then /^I should be signed out$/ do
- # page.should have_content "Sign up"
+  # page.should have_content "Sign up"
   page.should have_content "Login"
   page.should_not have_content "Logout"
 end
@@ -183,39 +183,39 @@ end
 ### UTILITY METHODS ###
 
 def create_visitor
-  @visitor = { :first_name => "Testy",
-           :last_name => "McUserton",
-            :email => "example@example.com",
-            :organization => "test orga",
-            :faculty => "test fac",
-            :chair => "test chair",
-            :password => "please",
-            :admin => false,
-            :password_confirmation => "please" }
+  @visitor = {:first_name => "Testy",
+              :last_name => "McUserton",
+              :email => "example@example.com",
+              :organization => "test orga",
+              :faculty => "test fac",
+              :chair => "test chair",
+              :password => "please",
+              :admin => false,
+              :password_confirmation => "please"}
 end
 
 def create_admin
-  @visitor = { :first_name => "Super",
-           :last_name => "User",
-            :email => "admin@example.com",
-            :organization => "test orga",
-            :faculty => "test fac",
-            :chair => "test chair",
-            :password => "please",
-            :admin => true,
-            :password_confirmation => "please" }
+  @visitor = {:first_name => "Super",
+              :last_name => "User",
+              :email => "admin@example.com",
+              :organization => "test orga",
+              :faculty => "test fac",
+              :chair => "test chair",
+              :password => "please",
+              :admin => true,
+              :password_confirmation => "please"}
 end
 
 def create_visitor2
-  @visitor = { :first_name => "Testor",
-           :last_name => "MacUsertoon",
-            :email => "example2@example.com",
-            :organization => "test orga",
-            :faculty => "test fac",
-            :chair => "test chair",
-            :password => "please",
-            :admin => false,
-            :password_confirmation => "please" }
+  @visitor = {:first_name => "Testor",
+              :last_name => "MacUsertoon",
+              :email => "example2@example.com",
+              :organization => "test orga",
+              :faculty => "test fac",
+              :chair => "test chair",
+              :password => "please",
+              :admin => false,
+              :password_confirmation => "please"}
 end
 
 def find_user
@@ -226,7 +226,7 @@ def create_unconfirmed_user
   create_visitor
   delete_user
   sign_up
-  visit '/users/sign_out'
+  visit "/users/sign_out"
 end
 
 def create_user
@@ -248,7 +248,7 @@ end
 
 def sign_up
   delete_user
-  visit '/users/sign_up'
+  visit "/users/sign_up"
   fill_in "First name", :with => @visitor[:first_name]
   fill_in "Last name", :with => @visitor[:last_name]
   fill_in "University / organization", :with => @visitor[:organization]
@@ -261,7 +261,7 @@ def sign_up
 end
 
 def sign_in
-  visit '/users/sign_in'
+  visit "/users/sign_in"
   fill_in "user_email", :with => @visitor[:email]
   fill_in "user_password", :with => @visitor[:password]
   click_button "Login"

@@ -21,17 +21,17 @@ module ApplicationHelper
 
   def duration_choices(future = false)
     Hash[DURATION_CHOICES.map do |duration|
-      if duration == 0  
-        [(future ? t("now") : t("w_out_countdown")), duration]    
-      else
-        min = Time.at(duration).strftime("%M").to_i
-        sec = Time.at(duration).strftime("%S").to_i
-        result = ""
-        result += min.to_s+" "+t("min")+" " if min > 0
-        result += sec.to_s+" "+t("sec") if sec > 0
-        [(future ? "in " : "") + result , duration]
-      end 
-    end]
+           if duration == 0
+             [(future ? t("now") : t("w_out_countdown")), duration]
+           else
+             min = Time.at(duration).strftime("%M").to_i
+             sec = Time.at(duration).strftime("%S").to_i
+             result = ""
+             result += min.to_s + " " + t("min") + " " if min > 0
+             result += sec.to_s + " " + t("sec") if sec > 0
+             [(future ? "in " : "") + result, duration]
+           end
+         end]
   end
 
   def quick_start_settings
@@ -40,24 +40,22 @@ module ApplicationHelper
     return Hash["options", 4, "duration", 60, "multi", false]
   end
 
-  
   # https://github.com/plataformatec/devise/wiki/How-To:-Display-a-custom-sign_in-form-anywhere-in-your-app
   def resource_name
     :user
   end
- 
+
   def resource
     @resource ||= User.new
   end
- 
+
   def devise_mapping
     @devise_mapping ||= Devise.mappings[:user]
   end
 
   def upb_network?
-    upb_net = ENV["ORG_SUBNET"]||"131.234.0.0/16"
+    upb_net = ENV["ORG_SUBNET"] || "131.234.0.0/16"
     upb = IPAddr.new(upb_net)
     upb === request.remote_ip
   end
-  
 end

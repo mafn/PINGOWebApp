@@ -4,7 +4,7 @@ class QuestionsController < ApplicationController
 
   def index
     if params[:public]
-      @questions = Question.where(public:true)
+      @questions = Question.where(public: true)
     elsif params[:shared]
       @questions = current_user.shared_questions
       unless @questions.any?
@@ -13,7 +13,7 @@ class QuestionsController < ApplicationController
       end
     else
       @questions = current_user.questions.desc(:created_at)
-      @questions = Question.all.desc(:created_at) if(params[:all] && current_user.admin?)
+      @questions = Question.all.desc(:created_at) if (params[:all] && current_user.admin?)
     end
 
     if params[:q_type] # TODO: refactor maybe? soooo long :(
@@ -90,7 +90,7 @@ class QuestionsController < ApplicationController
   def show
     @question = Question.find(params[:id]).service
     unless @question.public
-     check_access
+      check_access
     end
   end
 
@@ -101,14 +101,13 @@ class QuestionsController < ApplicationController
     @question_number = NumberQuestion.new  #refactor this maybe?
     @question_match = MatchQuestion.new.tap { |q| q.answer_pairs.build }
     @question_order = OrderQuestion.new.tap { |q| q.order_options.build }
-    @question_category = CategoryQuestion.new.tap do |q| 
-      q.categories.build 
+    @question_category = CategoryQuestion.new.tap do |q|
+      q.categories.build
       q.sub_words.build
     end
   end
 
   def edit
-    
   end
 
   def update
@@ -128,7 +127,6 @@ class QuestionsController < ApplicationController
         format.json { render json: @question.errors, status: :unprocessable_entity }
       end
     end
-
   end
 
   def transform
@@ -183,7 +181,7 @@ class QuestionsController < ApplicationController
           duration = @event.default_question_duration
           @survey.save
           @survey.start!(duration)
-          publish_push_notification("sess"+@survey.event.token.to_s, {:type => "status_change", :payload => "started", "timestamp" => Time.new})
+          publish_push_notification("sess" + @survey.event.token.to_s, {:type => "status_change", :payload => "started", "timestamp" => Time.new})
           start_countdown_worker(@survey.id) if duration > 0
         end
         format.html { redirect_to (@event || questions_path), notice: t("messages.question_successfully_created") }
@@ -246,7 +244,7 @@ class QuestionsController < ApplicationController
       end
       extension, exporter = get_parser params[:export_type]
       exported_string = exporter.export questions
-      send_data exported_string, type: Mime::Type.lookup_by_extension(extension), filename: 'Pingo_Questions.'+extension
+      send_data exported_string, type: Mime::Type.lookup_by_extension(extension), filename: "Pingo_Questions." + extension
     else
       redirect_to questions_path, alert: t("messages.select_questions_for_export")
     end
@@ -271,7 +269,6 @@ class QuestionsController < ApplicationController
   end
 
   def import
-
   end
 
   def upload
@@ -287,20 +284,21 @@ class QuestionsController < ApplicationController
   end
 
   protected
+
   def get_parser(p)
     case p
-      when "csv"
-        return "csv", CsvParser.new
-      when "aiken"
-        return "txt", AikenParser.new
-      when "moodle_xml"
-        return "xml", MoodleXmlParser.new
-      when "gift"
-        return "txt", GiftTxtParser.new
-      when "ilias"
-        return "xml", IliasParser.new
-      else
-        # Fehler
+    when "csv"
+      return "csv", CsvParser.new
+    when "aiken"
+      return "txt", AikenParser.new
+    when "moodle_xml"
+      return "xml", MoodleXmlParser.new
+    when "gift"
+      return "txt", GiftTxtParser.new
+    when "ilias"
+      return "xml", IliasParser.new
+    else
+      # Fehler
     end
   end
 
@@ -318,7 +316,7 @@ class QuestionsController < ApplicationController
     elsif params["order_question"] && params["order_question"][:tags]
       params[:question][:tags] = params["order_question"][:tags]
     elsif params["category_question"] && params["category_question"][:tags]
-      params[:question][:tags] = params["category_question"][:tags]  
+      params[:question][:tags] = params["category_question"][:tags]
     end
   end
 
@@ -330,17 +328,16 @@ class QuestionsController < ApplicationController
       redirect_to questions_path, status: :forbidden and return false
     end
     true
-  end 
-
-  def question_params
-    params.require(:question).permit(:name, :type, :description, :tags, 
-      :public, :collaborators_form, 
-      question_options_attributes: [:name, :correct, :id, :_destroy], 
-      answer_pairs_attributes: [:answer1, :answer2, :correct, :id, :_destroy], 
-      order_options_attributes: [:name, :position, :id, :_destroy],
-      relative_option_order_object_attributes: [:content_hash, :id, :_destroy],
-      categories_attributes: [:name, :sub_words, :id, :_destroy],
-      sub_words_attributes: [:name, :category, :id, :_destroy])
   end
 
+  def question_params
+    params.require(:question).permit(:name, :type, :description, :tags,
+                                     :public, :collaborators_form,
+                                     question_options_attributes: [:name, :correct, :id, :_destroy],
+                                     answer_pairs_attributes: [:answer1, :answer2, :correct, :id, :_destroy],
+                                     order_options_attributes: [:name, :position, :id, :_destroy],
+                                     relative_option_order_object_attributes: [:content_hash, :id, :_destroy],
+                                     categories_attributes: [:name, :sub_words, :id, :_destroy],
+                                     sub_words_attributes: [:name, :category, :id, :_destroy])
+  end
 end

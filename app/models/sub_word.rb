@@ -42,5 +42,4 @@ class SubWord
       return(self.votes[category])
     end
   end
-
 end

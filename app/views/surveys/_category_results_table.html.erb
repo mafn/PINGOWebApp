@@ -2,9 +2,9 @@
   <table id="result-table" class="result-table table table-bordered">
     <thead>
       <tr>
-          <% numberOfCategories = survey.categories.length %>
-          <% columnWidthPercentage = number_to_percentage(1.to_f / (1 + numberOfCategories).to_f * 100.to_f, :precision => 0) %>
-          <th style="width: <%= columnWidthPercentage %>;">&nbsp;</th>
+        <% numberOfCategories = survey.categories.length %>
+        <% columnWidthPercentage = number_to_percentage(1.to_f / (1 + numberOfCategories).to_f * 100.to_f, :precision => 0) %>
+        <th style="width: <%= columnWidthPercentage %>;">&nbsp;</th>
           <% survey.categories.each do |category| %>
             <th scope="col" style="width: <%= columnWidthPercentage %>;"><%= category.name %></th>
           <% end %>
@@ -24,20 +24,20 @@
             <td class="result-table-td toCorrectSwitchable" style="height: 50px;">
               <div>
                 <div style="height:<%= percentage %>;" />
-                <p><%= percentage %></p>
-              </div>
-            </td>
-          <% else %>
-            <td class="result-table-td" style="height: 50px;">
-              <div>  
-                <div style="height:<%= percentage %>;" />
-                <p><%= percentage %></p>
-              </div>
-            </td>
-          <% end %>
-        <% end %>
-      </tr>
-      <% end %>
-    </tbody>
-  </table>
+        <p><%= percentage %></p>
+      </div>
+    </td>
+  <% else %>
+    <td class="result-table-td" style="height: 50px;">
+      <div>
+        <div style="height:<%= percentage %>;" />
+        <p><%= percentage %></p>
+      </div>
+    </td>
+  <% end %>
+<% end %>
+</tr>
+<% end %>
+</tbody>
+</table>
 </body>

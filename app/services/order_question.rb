@@ -16,5 +16,4 @@ class OrderQuestion < GenericQuestion
   def to_survey
     OrderSurvey.new(self.question.to_survey)
   end
-
 end

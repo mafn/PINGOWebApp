@@ -1,4 +1,4 @@
-require File.expand_path('../boot', __FILE__)
+require File.expand_path("../boot", __FILE__)
 
 # Pick the frameworks you want:
 # require "active_record/railtie"
@@ -34,11 +34,11 @@ module Eclickr
 
     # Set Time.zone default to the specified zone and make Active Record auto-convert to this zone.
     # Run "rake -D time" for a list of tasks for finding time zone names. Default is UTC.
-    config.time_zone = 'Berlin'
+    config.time_zone = "Berlin"
 
     # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
     # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
-    config.i18n.load_path += Dir[Rails.root.join('config', 'locales', '**', '*.{rb,yml}')]
+    config.i18n.load_path += Dir[Rails.root.join("config", "locales", "**", "*.{rb,yml}")]
     #config.i18n.default_locale = :de
 
     config.i18n.enforce_available_locales = false
@@ -53,17 +53,17 @@ module Eclickr
     config.assets.enabled = true
 
     # Version of your assets, change this if you want to expire all your assets
-    config.assets.version = '1.0'
+    config.assets.version = "1.0"
 
     # also compile lecturer JS (not in the normal application.js)
     config.assets.precompile += %w(lecturer.js)
-    
+
     # also compile lecturer CSS (not in the normal application.css)
     config.assets.precompile += %w(lecturer.css)
-    
+
     config.generators do |g|
-        g.view_specs false
-        g.helper_specs false
+      g.view_specs false
+      g.helper_specs false
     end
   end
 end

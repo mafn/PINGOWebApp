@@ -1,4 +1,5 @@
 require "rexml/document"
+
 class IliasParser
   include REXML
 
@@ -19,7 +20,7 @@ class IliasParser
       unless question.tags.nil? || question.tags.empty?
         @@log.debug question.tags.to_s
         tags_node = question_node.add_element "qticomment"
-        question.tags.split(',').each do |tag|
+        question.tags.split(",").each do |tag|
           tag_node = tags_node.add_element "tag"
           (tag_node.add_element "text").text = tag
         end
@@ -60,7 +61,6 @@ class IliasParser
       presentation_node = question_node.add_element "presentation"
       presentation_node.attributes["label"] = question.name
 
-
       flow_node = presentation_node.add_element "flow"
       mattext_node = (flow_node.add_element "material").add_element "mattext"
       mattext_node.attributes["texttype"] = "text/xhtml"
@@ -76,14 +76,13 @@ class IliasParser
         end
       elsif question.type == "number"
         response_lid_node = flow_node.add_element "response_num"
-        response_lid_node.attributes["ident"]="NUM"
-        response_lid_node.attributes["rcardinality"]="Single"
-        response_lid_node.attributes["numtype"]="Decimal"
+        response_lid_node.attributes["ident"] = "NUM"
+        response_lid_node.attributes["rcardinality"] = "Single"
+        response_lid_node.attributes["numtype"] = "Decimal"
         render_fib_node = response_lid_node.add_element "render_fib"
         render_fib_node.attributes["fibtype"] = "Decimal"
         render_fib_node.attributes["maxchars"] = "10"
       elsif question.type == "text"
-
       end
 
       resprocessing_node = question_node.add_element "resprocessing"
@@ -126,90 +125,88 @@ class IliasParser
         setvar_node = respcondition_node.add_element "setvar"
         setvar_node.text = "3"
         setvar_node.attributes["action"] = "Add"
-      # following code concerning match questions is based on qti 2.0 schemata
-      # see http://www.imsglobal.org/question/qti_v2p0/examples/items/match.xml
-      elsif question.type == "match" 
+        # following code concerning match questions is based on qti 2.0 schemata
+        # see http://www.imsglobal.org/question/qti_v2p0/examples/items/match.xml
+      elsif question.type == "match"
         capital_alphabet = %W(A B C D E F G H I J K L M N O P Q R S T U V W X Y Z)
         small_alphabet = %W(a b c d e f g h i j k l m n o p q r s t u v w x y z)
         responseDeclaration_node = question_node.add_element "responseDeclaration"
         responseDeclaration_node.attributes["identifier"] = "RESPONSE"
         responseDeclaration_node.attributes["identifier"] = "multiple"
         responseDeclaration_node.attributes["baseType"] = "directedPair"
-          correctResponse_node = responseDeclaration_node.add_element "correctResponse"
-          mapping_node = responseDeclaration_node.add_element "mapping"
-          mapping_node.attributes["defaultValue"] = "0"
-          alphabetIndex = 0
-          question.answer_pairs.where(correct: true).each do |pair|
-            value_node = correctResponse_node.add_element "value"
-            value_node.text = capital_alphabet[alphabetIndex] + " " + small_alphabet[alphabetIndex]
-            mapEntry_node = mapping_node.add_element "mapEntry"
-            mapEntry_node.attributes["mapKey"] = capital_alphabet[alphabetIndex] + " " + small_alphabet[alphabetIndex]
-            mapEntry_node.attributes["mappedValue"] = "1"
-            alphabetIndex += 1
-          end
+        correctResponse_node = responseDeclaration_node.add_element "correctResponse"
+        mapping_node = responseDeclaration_node.add_element "mapping"
+        mapping_node.attributes["defaultValue"] = "0"
+        alphabetIndex = 0
+        question.answer_pairs.where(correct: true).each do |pair|
+          value_node = correctResponse_node.add_element "value"
+          value_node.text = capital_alphabet[alphabetIndex] + " " + small_alphabet[alphabetIndex]
+          mapEntry_node = mapping_node.add_element "mapEntry"
+          mapEntry_node.attributes["mapKey"] = capital_alphabet[alphabetIndex] + " " + small_alphabet[alphabetIndex]
+          mapEntry_node.attributes["mappedValue"] = "1"
+          alphabetIndex += 1
+        end
         outcomeDeclaration_node = question_node.add_element "outcomeDeclaration"
         outcomeDeclaration_node.attributes["identifier"] = "SCORE"
         outcomeDeclaration_node.attributes["cardinality"] = "single"
         outcomeDeclaration_node.attributes["baseType"] = "float"
         itemBody_node = question_node.add_element "itemBody"
-          matchInteraction_node = itemBody_node.add_element "matchInteraction"
-          matchInteraction_node.attributes["responseIdentifier"] = "RESPONSE"
-          matchInteraction_node.attributes["shuffle"] = "true"
-          matchInteraction_node.attributes["maxAssociations"] = question.answer_pairs.where(correct: true).length.to_s
-            prompt_node = matchInteraction_node.add_element "prompt"
-            prompt_node.text = question.name
-            simpleMatchSet_node = matchInteraction_node.add_element "simpleMatchSet"
-            alphabetIndex = 0
-            question.answer_pairs.where(correct: true).each do |pair|
-              simpleAssociableChoice_node = simpleMatchSet_node.add_element "simpleAssociableChoice"
-              simpleAssociableChoice_node.attributes["identifier"] = capital_alphabet[alphabetIndex] + ""
-              simpleAssociableChoice_node.attributes["matchMax"] = "1"
-              simpleAssociableChoice_node.text = pair.answer1
-              alphabetIndex += 1
-            end
-            simpleMatchSet_node = matchInteraction_node.add_element "simpleMatchSet"
-            alphabetIndex = 0
-            question.answer_pairs.where(correct: true).each do |pair|
-              simpleAssociableChoice_node = simpleMatchSet_node.add_element "simpleAssociableChoice"
-              simpleAssociableChoice_node.attributes["identifier"] = small_alphabet[alphabetIndex] + ""
-              simpleAssociableChoice_node.attributes["matchMax"] = "1"
-              simpleAssociableChoice_node.text = pair.answer2
-              alphabetIndex += 1
-            end
+        matchInteraction_node = itemBody_node.add_element "matchInteraction"
+        matchInteraction_node.attributes["responseIdentifier"] = "RESPONSE"
+        matchInteraction_node.attributes["shuffle"] = "true"
+        matchInteraction_node.attributes["maxAssociations"] = question.answer_pairs.where(correct: true).length.to_s
+        prompt_node = matchInteraction_node.add_element "prompt"
+        prompt_node.text = question.name
+        simpleMatchSet_node = matchInteraction_node.add_element "simpleMatchSet"
+        alphabetIndex = 0
+        question.answer_pairs.where(correct: true).each do |pair|
+          simpleAssociableChoice_node = simpleMatchSet_node.add_element "simpleAssociableChoice"
+          simpleAssociableChoice_node.attributes["identifier"] = capital_alphabet[alphabetIndex] + ""
+          simpleAssociableChoice_node.attributes["matchMax"] = "1"
+          simpleAssociableChoice_node.text = pair.answer1
+          alphabetIndex += 1
+        end
+        simpleMatchSet_node = matchInteraction_node.add_element "simpleMatchSet"
+        alphabetIndex = 0
+        question.answer_pairs.where(correct: true).each do |pair|
+          simpleAssociableChoice_node = simpleMatchSet_node.add_element "simpleAssociableChoice"
+          simpleAssociableChoice_node.attributes["identifier"] = small_alphabet[alphabetIndex] + ""
+          simpleAssociableChoice_node.attributes["matchMax"] = "1"
+          simpleAssociableChoice_node.text = pair.answer2
+          alphabetIndex += 1
+        end
         responseProcessing_node = question_node.add_element "responseProcessing"
         responseProcessing_node.attributes["template"] = "http://www.imsglobal.org/question/qti_v2p0/rptemplates/map_response"
-      # following code concerning order questions is based on qti 2.0 schemata
-      # see http://www.imsglobal.org/question/qti_v2p0/examples/items/order.xml
-      elsif question.type = "order"  
+        # following code concerning order questions is based on qti 2.0 schemata
+        # see http://www.imsglobal.org/question/qti_v2p0/examples/items/order.xml
+      elsif question.type = "order"
         responseDeclaration_node = question_node.add_element "responseDeclaration"
         responseDeclaration_node.attributes["identifier"] = "RESPONSE"
         responseDeclaration_node.attributes["cardinality"] = "ordered"
         responseDeclaration_node.attributes["baseType"] = "identifier"
-          correctResponse_node = responseDeclaration_node.add_element "correctResponse"
-          for position in 1..question.order_options.length
-            value_node = correctResponse_node.add_element "value"
-            value_node.text = position.to_s
-          end
-          outcomeDeclaration_node = responseDeclaration_node.add_element "outcomeDeclaration"
-          outcomeDeclaration_node.attributes["identifier"] = "SCORE"
-          outcomeDeclaration_node.attributes["cardinality"] = "single"
-          outcomeDeclaration_node.attributes["baseType"] = "integer"
+        correctResponse_node = responseDeclaration_node.add_element "correctResponse"
+        for position in 1..question.order_options.length
+          value_node = correctResponse_node.add_element "value"
+          value_node.text = position.to_s
+        end
+        outcomeDeclaration_node = responseDeclaration_node.add_element "outcomeDeclaration"
+        outcomeDeclaration_node.attributes["identifier"] = "SCORE"
+        outcomeDeclaration_node.attributes["cardinality"] = "single"
+        outcomeDeclaration_node.attributes["baseType"] = "integer"
         itemBody_node = question_node.add_element "itemBody"
-          orderInteraction_node = itemBody_node.add_element "orderInteraction"
-          orderInteraction_node.attributes["responseIdentifier"] = "RESPONSE"
-          orderInteraction_node.attributes["shuffle"] = "true"
-            prompt_node = orderInteraction_node.add_element "prompt"
-            prompt_node.text = question.name
-            for position in 1..question.order_options.length
-              simpleChoice_node = orderInteraction_node.add_element "simpleChoice"
-              simpleChoice_node.text = question.order_options.where(position: position).first.name
-              simpleChoice_node.attributes["identifier"] = position.to_s
-            end
+        orderInteraction_node = itemBody_node.add_element "orderInteraction"
+        orderInteraction_node.attributes["responseIdentifier"] = "RESPONSE"
+        orderInteraction_node.attributes["shuffle"] = "true"
+        prompt_node = orderInteraction_node.add_element "prompt"
+        prompt_node.text = question.name
+        for position in 1..question.order_options.length
+          simpleChoice_node = orderInteraction_node.add_element "simpleChoice"
+          simpleChoice_node.text = question.order_options.where(position: position).first.name
+          simpleChoice_node.attributes["identifier"] = position.to_s
+        end
         responseProcessing_node = question_node.add_element "responseProcessing"
         responseProcessing_node.attributes["template"] = "http://www.imsglobal.org/question/qti_v2p0/rptemplates/match_correct"
       end
-
-
     end
 
     s = ""
@@ -218,7 +215,7 @@ class IliasParser
     s
   end
 
-  def import (xml_file, user, tags)
+  def import(xml_file, user, tags)
     errors = []
     successes = []
     begin
@@ -237,27 +234,27 @@ class IliasParser
         end
 
         # Bekannte aber nicht unterstützte Formate filtern
-        if question_type.in? ['assOrderingHorizontal', 'ORDERING QUESTION', 'assFileUpload', 'assFlashQuestion', 'IMAGE MAP QUESTION', 'assErrorText', 'CLOZE QUESTION']
-          errors << {"type" => "unsupported_type", "text" => element.elements["presentation/flow/material/mattext"].text.gsub(/<\S*>/,"")}
+        if question_type.in? ["assOrderingHorizontal", "ORDERING QUESTION", "assFileUpload", "assFlashQuestion", "IMAGE MAP QUESTION", "assErrorText", "CLOZE QUESTION"]
+          errors << {"type" => "unsupported_type", "text" => element.elements["presentation/flow/material/mattext"].text.gsub(/<\S*>/, "")}
           next
         end
 
         # Erstellung einer entsprechenden Frage
-        if question_type == 'SINGLE CHOICE QUESTION'
-          q = Question.new(type:"single").service
-        elsif question_type == 'MULTIPLE CHOICE QUESTION'
-          q = Question.new(type:"multi").service
-        elsif question_type == 'NUMERIC QUESTION'
-          q = Question.new(type:"number").service
-        elsif question_type.in? ['TEXT QUESTION', 'TEXTSUBSET QUESTION']
-          q = Question.new(type:"text").service
+        if question_type == "SINGLE CHOICE QUESTION"
+          q = Question.new(type: "single").service
+        elsif question_type == "MULTIPLE CHOICE QUESTION"
+          q = Question.new(type: "multi").service
+        elsif question_type == "NUMERIC QUESTION"
+          q = Question.new(type: "number").service
+        elsif question_type.in? ["TEXT QUESTION", "TEXTSUBSET QUESTION"]
+          q = Question.new(type: "text").service
           q.add_setting "answers", TextSurvey::MULTI_ANSWERS
-        elsif question_type == 'MATCHING QUESTION'
-          q = Question.new(type:"match").service
-        elsif question_type == 'ORDER QUESTION'
-          q = Question.new(type:"order").service
+        elsif question_type == "MATCHING QUESTION"
+          q = Question.new(type: "match").service
+        elsif question_type == "ORDER QUESTION"
+          q = Question.new(type: "order").service
         else
-          errors << {"type" => "unknown_type", "text" => element.elements["presentation/flow/material/mattext"].text.gsub(/<\S*>/,"")}
+          errors << {"type" => "unknown_type", "text" => element.elements["presentation/flow/material/mattext"].text.gsub(/<\S*>/, "")}
           next
         end
 
@@ -275,14 +272,14 @@ class IliasParser
         end
 
         # Fragetext setzen
-        q.name = element.elements["presentation/flow/material/mattext"].text.gsub(/<\S*>/,"")
+        q.name = element.elements["presentation/flow/material/mattext"].text.gsub(/<\S*>/, "")
 
         option_hash = Hash.new
 
         # Antwortmöglichkeiten entnehmen und Identifier als Hash merken
-        if question_type.in? ['SINGLE CHOICE QUESTION', 'MULTIPLE CHOICE QUESTION']
+        if question_type.in? ["SINGLE CHOICE QUESTION", "MULTIPLE CHOICE QUESTION"]
           element.elements.each("presentation/flow/response_lid/render_choice/response_label") do |response_label|
-            option = QuestionOption.new(name:response_label.elements["material/mattext"].text)
+            option = QuestionOption.new(name: response_label.elements["material/mattext"].text)
             response_id = response_label.attributes["ident"]
             option_hash[response_id] = option
             q.question_options << option
@@ -301,15 +298,15 @@ class IliasParser
               end
             end
           end
-        elsif question_type == 'MATCHING QUESTION'
+        elsif question_type == "MATCHING QUESTION"
           element.elements.each("itemBody/matchInteraction/prompt") do |elem|
             q.name = elem.text
             break
           end
           element.elements.each("itemBody/matchInteraction/simpleMatchSet/simpleAssociableChoice") do |elem|
-            if(/[[:upper:]]/.match(elem.attributes["identifier"]))
+            if (/[[:upper:]]/.match(elem.attributes["identifier"]))
               element.elements.each("itemBody/matchInteraction/simpleMatchSet/simpleAssociableChoice") do |innerElem|
-                if(innerElem.attributes["identifier"]!=elem.attributes["identifier"].downcase)
+                if (innerElem.attributes["identifier"] != elem.attributes["identifier"].downcase)
                   next
                 else
                   q.answer_pairs << AnswerPair.new(answer1: elem.text, answer2: innerElem.text)
@@ -320,7 +317,7 @@ class IliasParser
               next
             end
           end
-        elsif question_type == 'ORDER QUESTION'
+        elsif question_type == "ORDER QUESTION"
           element.elements.each("itemBody/orderInteraction/prompt") do |elem|
             q.name = elem.text
             break
@@ -352,6 +349,7 @@ class IliasParser
   end
 
   protected
+
   def create_metadata(parent, labels, entries)
     current = 0
     labels.each do |label|
@@ -361,7 +359,7 @@ class IliasParser
       current = current + 1
     end
   end
-  
+
   # following method from http://rosettacode.org/wiki/Strip_control_codes_and_extended_characters_from_a_string#Ruby
   def strip_control_characters(_str)
     _str.chars.each_with_object("") do |char, str|

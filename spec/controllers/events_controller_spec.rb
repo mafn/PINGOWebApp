@@ -1,7 +1,6 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe EventsController do
-
   def create_test_session
     @survey = FactoryGirl.create(:survey)
     @event = @survey.event
@@ -9,7 +8,7 @@ describe EventsController do
   end
 
   def set_browser_locale(locale)
-    request.env['HTTP_ACCEPT_LANGUAGE'] = "#{locale};q=1.0"
+    request.env["HTTP_ACCEPT_LANGUAGE"] = "#{locale};q=1.0"
   end
 
   describe "show" do
@@ -47,6 +46,4 @@ describe EventsController do
       assert_select "html[lang=?]", /de/
     end
   end
-
-
 end

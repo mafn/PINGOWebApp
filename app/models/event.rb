@@ -1,5 +1,4 @@
 class Event
-
   TOKEN_LENGTH = (Rails.env.staging? ? 3 : 4)
 
   include Mongoid::Document
@@ -43,7 +42,7 @@ class Event
   def self.find_by_id_or_token(token_or_id)
     if token_or_id.length <= TOKEN_LENGTH && !token_or_id.to_s.blank?
       if token_or_id.to_s.length < TOKEN_LENGTH
-        Event.find_by_token("0"*(TOKEN_LENGTH - token_or_id.to_s.length) + token_or_id.to_s)
+        Event.find_by_token("0" * (TOKEN_LENGTH - token_or_id.to_s.length) + token_or_id.to_s)
       else
         Event.find_by_token(token_or_id)
       end
@@ -53,8 +52,8 @@ class Event
   end
 
   def delete_cache
-    Rails.cache.delete("Events/"+self.id.to_s)
-    Rails.cache.delete("last_survey/"+self.id.to_s)
+    Rails.cache.delete("Events/" + self.id.to_s)
+    Rails.cache.delete("last_survey/" + self.id.to_s)
   end
 
   def refresh_state
@@ -62,7 +61,7 @@ class Event
   end
 
   def current_viewers
-    PINGO_REDIS.get("vote_hub/" + (self.token.to_s.gsub(/[^a-zA-Z 0-9]/, "")).gsub(/\s/,'-')) unless ENV["USE_JUGGERNAUT"] == "false"
+    PINGO_REDIS.get("vote_hub/" + (self.token.to_s.gsub(/[^a-zA-Z 0-9]/, "")).gsub(/\s/, "-")) unless ENV["USE_JUGGERNAUT"] == "false"
   end
 
   def mathjax?
@@ -93,7 +92,7 @@ class Event
       print "#{i.to_s}: #{e.token.to_s} .. "
       old_token = e.token.to_s
       # FIXME: Warning: The following line adds two zeros (hard coded!). Please adapt for your token length.
-      new_token =  "00#{e.token.to_s}" # ("%0#{Event::TOKEN_LENGTH.to_s}d" % e.token.to_s)
+      new_token = "00#{e.token.to_s}" # ("%0#{Event::TOKEN_LENGTH.to_s}d" % e.token.to_s)
       print "#{old_token} -> #{new_token} .. "
       begin
         e.set(:token, new_token)
@@ -106,5 +105,4 @@ class Event
     end
     [results, errors]
   end
-
 end

@@ -1,6 +1,8 @@
 require "rexml/document"
-class MoodleXmlParser 
+
+class MoodleXmlParser
   include REXML
+
   def export(questions)
     root = Element.new "quiz"
 
@@ -24,7 +26,7 @@ class MoodleXmlParser
       # tags anlegen, falls sie existieren
       unless question.tags.nil? || question.tags.empty?
         tags_node = question_node.add_element "tags"
-        question.tags.split(',').each do |tag|
+        question.tags.split(",").each do |tag|
           tag_node = tags_node.add_element "tag"
           (tag_node.add_element "text").text = tag
         end
@@ -82,7 +84,6 @@ class MoodleXmlParser
         end
         (question_node.add_element "shuffleanswers").text = "true"
       end
-
     end
 
     s = ""
@@ -93,98 +94,97 @@ class MoodleXmlParser
     s
   end
 
-  def import (xml_file, user, tags)
+  def import(xml_file, user, tags)
     errors = []
     successes = []
     begin
-    xml_string = xml_file.read
-    xml_string = Converter.new.convert_to_utf8 xml_string
-    doc = Document.new xml_string
+      xml_string = xml_file.read
+      xml_string = Converter.new.convert_to_utf8 xml_string
+      doc = Document.new xml_string
 
-    # Über Question-Elemente iterieren
-    doc.elements.each("quiz/question") do |element|
-      question_type = element.attributes["type"]
-      q = Question.new
+      # Über Question-Elemente iterieren
+      doc.elements.each("quiz/question") do |element|
+        question_type = element.attributes["type"]
+        q = Question.new
 
-      # Zunächst den Questiontype feststellen
-      if question_type == 'multichoice' || question_type == 'truefalse'
-        if element.elements["single"].text || question_type == 'truefalse'
-          q = Question.new(type:"single").service
+        # Zunächst den Questiontype feststellen
+        if question_type == "multichoice" || question_type == "truefalse"
+          if element.elements["single"].text || question_type == "truefalse"
+            q = Question.new(type: "single").service
+          else
+            q = Question.new(type: "multi").service
+          end
+        elsif question_type == "shortanswer" || question_type == "essay"
+          q = Question.new(type: "text").service
+        elsif question_type == "numerical"
+          q = Question.new(type: "number").service
+        elsif question_type == "match"
+          q = Question.new(type: "match").service
+        elsif question_type == "cloze" || question_type == "description"
+          # Nicht unterstützte Fragen abfangen
+          errors << {"type" => "unsupported_type", "text" => element.elements["questiontext/text"].text}
+          next
         else
-          q = Question.new(type:"multi").service
+          # Unbekannte Fragetypen abfangen
+          errors << {"type" => "unknown_type", "text" => element.elements["questiontext/text"].text}
+          next
         end
-      elsif question_type == 'shortanswer' || question_type == 'essay'
-        q = Question.new(type:"text").service
-      elsif question_type == 'numerical'
-        q = Question.new(type:"number").service
-      elsif question_type == 'match'
-        q = Question.new(type:"match").service
-      elsif question_type == 'cloze' || question_type == 'description'
-        # Nicht unterstützte Fragen abfangen
-        errors << {"type" => "unsupported_type", "text" => element.elements["questiontext/text"].text}
-        next
-      else
-        # Unbekannte Fragetypen abfangen
-        errors << {"type" => "unknown_type", "text" => element.elements["questiontext/text"].text}
-        next
-      end
 
-      # Fragetext setzen
-      q.name = ActionView::Base.full_sanitizer.sanitize(element.elements["questiontext/text"].text)
+        # Fragetext setzen
+        q.name = ActionView::Base.full_sanitizer.sanitize(element.elements["questiontext/text"].text)
 
-      # Tags dieser spezifischen Frage auslesen und setzen
-      tags_string = ""
-      element.elements.each("tags/tag") do |tag_element|
-        if tags_string == ""
-          tags_string = tag_element.elements["text"].text
+        # Tags dieser spezifischen Frage auslesen und setzen
+        tags_string = ""
+        element.elements.each("tags/tag") do |tag_element|
+          if tags_string == ""
+            tags_string = tag_element.elements["text"].text
+          else
+            tags_string << "," + tag_element.elements["text"].text
+          end
+        end
+        unless tags_string == ""
+          q.tags = tags_string
+        end
+
+        # Über Antwortmöglichkeiten iterieren, bei Number-Fragen oder Freitext-Fragen werden die korrekten Antworten ignoriert
+        if question_type == "numerical" || question_type == "essay" || question_type == "shortanswer"
+        elsif question_type == "match"
+          element.elements.each("subquestion") do |pair|
+            answer1 = pair.elements["text"].text
+            answer2 = pair.elements["answer"].elements["text"].text
+            q.answer_pairs << AnswerPair.new(answer1: answer1, answer2: answer2)
+          end
         else
-          tags_string << "," + tag_element.elements["text"].text
+          element.elements.each("answer") do |answer|
+            correct = Integer(answer.attributes["fraction"]) > 0 ? true : false
+            text = ActionView::Base.full_sanitizer.sanitize(answer.elements["text"].text)
+            q.question_options << QuestionOption.new(name: text, correct: correct)
+          end
+        end
+
+        # Wenn Textfrage dann genau eine Antwort, Moodle unterstützt keine Begrenzung
+        if q.type == "text"
+          q.add_setting "answers", TextSurvey::ONE_ANSWER
+        end
+        q.user = user
+
+        # Hinzufügen von tags, die für alle importierten Fragen gelten sollen
+        unless q.tags.nil? || q.tags.empty?
+          q.tags = q.tags + "," + tags
+        else
+          q.tags = tags
+        end
+
+        unless q.save
+          errors << {"type" => "unknown_error", "text" => q.name}
+        else
+          successes << {"text" => q.name}
         end
       end
-      unless tags_string == ""
-        q.tags = tags_string
-      end
-
-      # Über Antwortmöglichkeiten iterieren, bei Number-Fragen oder Freitext-Fragen werden die korrekten Antworten ignoriert
-      if question_type == "numerical" || question_type == "essay" || question_type == "shortanswer"
-      elsif question_type == "match"
-        element.elements.each("subquestion") do |pair|
-          answer1 = pair.elements["text"].text
-          answer2 = pair.elements["answer"].elements["text"].text
-          q.answer_pairs << AnswerPair.new(answer1: answer1, answer2: answer2)
-        end
-      else
-        element.elements.each("answer") do |answer|
-          correct = Integer(answer.attributes["fraction"]) > 0 ? true : false
-          text = ActionView::Base.full_sanitizer.sanitize(answer.elements["text"].text)
-          q.question_options << QuestionOption.new(name: text, correct: correct)
-        end
-      end
-
-      # Wenn Textfrage dann genau eine Antwort, Moodle unterstützt keine Begrenzung
-      if q.type == "text"
-        q.add_setting "answers", TextSurvey::ONE_ANSWER
-      end
-      q.user = user
-
-      # Hinzufügen von tags, die für alle importierten Fragen gelten sollen
-      unless q.tags.nil? || q.tags.empty?
-        q.tags = q.tags + "," + tags
-      else
-        q.tags = tags
-      end
-
-      unless q.save
-        errors << {"type" => "unknown_error", "text" => q.name}
-      else
-        successes << {"text" => q.name}
-      end
-    end
     rescue Exception
       # Fallback für alle nicht behandelten Fehler
       errors << {"type" => "file_error", "text" => "all"}
     end
     return errors, successes
   end
-
 end

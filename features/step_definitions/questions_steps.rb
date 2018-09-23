@@ -7,7 +7,7 @@ Given /^there exists a multiple choice question with the name "(.*?)" for "(.*?)
 end
 
 Given /^there exists a public question with the name "(.*?)"$/ do |name|
-  @question = Question.create!(name: name, type:"multi", public: true)
+  @question = Question.create!(name: name, type: "multi", public: true)
 end
 
 When /^I create the single choice question "(.*?)" with the answers "(.*?)"$/ do |name, answers|
@@ -26,7 +26,7 @@ Given /^I tag "(.*?)" with "(.*?)"$/ do |name, tag|
   q.save!
 end
 
-def get_user_by_mail(user)    # Model.find_by_ATTR will be deprecated in Rails 4
+def get_user_by_mail(user) # Model.find_by_ATTR will be deprecated in Rails 4
   user_obj = User.where(email: user).first
   raise "E-Mail '#{user}' not found (while creating a user's question)" if user_obj.nil?
   user_obj

@@ -1,8 +1,7 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe QuestionsController do
-
-  def create_hackable_question 
+  def create_hackable_question
     @question = create_multiple_choice_question
     @user = FactoryGirl.create(:user)
     @question.user = @user
@@ -14,7 +13,7 @@ describe QuestionsController do
       create_hackable_question
       login_hacker
 
-      post :update, id: @question.id, question: { name: "foo" }
+      post :update, id: @question.id, question: {name: "foo"}
       expect(response.status).to eq(403)
       expect(@question.reload.name).not_to eq("foo")
     end
@@ -23,7 +22,7 @@ describe QuestionsController do
       create_hackable_question
       sign_in @user
 
-      post :update, id: @question.id, question: { name: "foo" }
+      post :update, id: @question.id, question: {name: "foo"}
       expect(response.status).to eq(302)
       expect(@question.reload.name).to eq("foo")
     end
@@ -34,7 +33,7 @@ describe QuestionsController do
       @question.collaborators << @hacker
       @question.save!
 
-      post :update, id: @question.id, question: { name: "foo" }
+      post :update, id: @question.id, question: {name: "foo"}
       expect(response.status).to eq(302)
       expect(@question.reload.name).to eq("foo")
     end
@@ -44,7 +43,7 @@ describe QuestionsController do
       sign_in @user
       hacker = FactoryGirl.create(:hacker)
 
-      post :update, id: @question.id, question: { collaborators_form: [hacker.id] }
+      post :update, id: @question.id, question: {collaborators_form: [hacker.id]}
       expect(response.status).to eq(302)
       expect(@question.reload.collaborator_ids).to include(hacker.id)
     end
@@ -78,8 +77,8 @@ describe QuestionsController do
     end
   end
 
-  describe "show" do 
-    it "allows showing public questions" do 
+  describe "show" do
+    it "allows showing public questions" do
       create_hackable_question
       @question.update_attributes(public: true)
       login_hacker
@@ -99,8 +98,8 @@ describe QuestionsController do
     end
   end
 
-  describe "edit" do 
-    it "prevents editing foreign questions" do 
+  describe "edit" do
+    it "prevents editing foreign questions" do
       create_hackable_question
       login_hacker
 
@@ -108,7 +107,7 @@ describe QuestionsController do
       expect(response.status).to eq(403)
     end
 
-    it "allows admins to edit foreign questions" do 
+    it "allows admins to edit foreign questions" do
       create_hackable_question
       login_hacker
       @hacker.update_attribute(:admin, true)
@@ -117,7 +116,7 @@ describe QuestionsController do
       expect(response.status).to eq(200)
     end
 
-    it "allows editing own questions" do 
+    it "allows editing own questions" do
       create_hackable_question
       sign_in @user
 

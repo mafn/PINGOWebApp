@@ -1,5 +1,5 @@
 module PINGOSpecHelpers
-  def create_multiple_choice_question 
+  def create_multiple_choice_question
     question = MultipleChoiceQuestion.new
     question.name = "My Question"
     question
